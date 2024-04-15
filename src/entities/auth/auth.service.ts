@@ -14,7 +14,7 @@ export class AuthService {
     private readonly userModel: Model<User>
   ) {}
 
-  async register(dto: createUserDto) {
+  async register(dto: createUserDto): Promise<User> {
     const isUserExist = await this.userModel.findOne({email: dto.email});
     if (isUserExist) {
       throw CustomErrors.ConflictError(ErrorMessages.USER_ALREADY_EXISTS);
