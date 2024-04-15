@@ -8,3 +8,11 @@ export class JwtI {
   })
   accessToken: string;
 }
+
+export class JwtPayloadI {
+  @ApiProperty({
+    example: '661d1fd7fca08b6a72d2440e',
+    required: true
+  })
+  _id: string;
+}

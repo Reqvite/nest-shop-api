@@ -5,7 +5,6 @@ export type UserDocument = HydratedDocument<User>;
 
 @Schema({timestamps: true, versionKey: false})
 export class User {
-  @Prop()
   _id: MongooseSchema.Types.ObjectId;
 
   @Prop({required: true})

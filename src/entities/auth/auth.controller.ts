@@ -1,10 +1,12 @@
-import {Body, Controller, HttpCode, HttpStatus, Post, UsePipes} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, HttpStatus, Post, Req, UseGuards, UsePipes} from '@nestjs/common';
 import {ApiTags} from '@nestjs/swagger';
+import {Request} from 'express';
 import {YupValidationPipe} from '@/pipes/yupValidation.pipe';
 import {JwtI} from '@/types/jwt.interface';
 import {AuthService} from './auth.service';
 import {createUserDto} from './dto/createUser.dto';
 import {loginUserDto} from './dto/loginUser.dto';
+import {JwtAuthGuard} from './guards/jwt.guard';
 import {User} from './model/user.model';
 import {AuthSwagger} from './swagger/auth.swagger';
 import {createUserSchema} from './validation/createUser.schema';
@@ -30,5 +32,12 @@ export class AuthController {
     const user = await this.authService.validateUser(dto);
 
     return this.authService.login(user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('current')
+  @AuthSwagger.current()
+  async currentUser(@Req() req: Request) {
+    return req.user;
   }
 }
