@@ -2,7 +2,7 @@ import {Body, Controller, Get, HttpCode, HttpStatus, Post, Req, UseGuards, UsePi
 import {ApiTags} from '@nestjs/swagger';
 import {Request} from 'express';
 import {YupValidationPipe} from '@/pipes/yupValidation.pipe';
-import {JwtI} from '@/types/jwt.interface';
+import {JwtI, JwtPayloadI} from '@/types/jwt.interface';
 import {AuthService} from './auth.service';
 import {createUserDto} from './dto/createUser.dto';
 import {loginUserDto} from './dto/loginUser.dto';
@@ -37,7 +37,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('current')
   @AuthSwagger.current()
-  async currentUser(@Req() req: Request) {
-    return req.user;
+  async currentUser(@Req() req: Request): Promise<JwtPayloadI> {
+    return req.user as JwtPayloadI;
   }
 }
