@@ -15,8 +15,5 @@ export const createUserSchema = yup.object().shape({
   lastName: yup.string().min(3).max(30).required(),
   email: yup.string().email().required(),
   password: passwordComplexity,
-  phoneNumber: yup
-    .string()
-    .matches(/^[0-9]{12}$/, ErrorMessages.INVALID_PHONE_FORMAT())
-    .required()
+  phoneNumber: yup.string().matches(/^[0-9]{12}$/, ErrorMessages.INVALID_PHONE_FORMAT())
 });

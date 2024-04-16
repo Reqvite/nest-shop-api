@@ -5,7 +5,8 @@ import {MongooseModule} from '@nestjs/mongoose';
 import {PassportModule} from '@nestjs/passport';
 import {jwtConfig} from '@/configuration/jwt.config';
 import {User, UserSchema} from './model/user.model';
-import {JwtStrategy} from './strategies/jwt.strategy';
+import {AccessTokenStrategy} from './strategies/accessToken.strategy';
+import {RefreshTokenStrategy} from './strategies/refreshToken.strategy';
 import {UserController} from './user.controller';
 import {UserService} from './user.service';
 
@@ -17,6 +18,6 @@ import {UserService} from './user.service';
     ConfigModule
   ],
   controllers: [UserController],
-  providers: [UserService, JwtStrategy]
+  providers: [UserService, AccessTokenStrategy, RefreshTokenStrategy]
 })
 export class UserModule {}

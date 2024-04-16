@@ -2,7 +2,7 @@ import {applyDecorators, HttpStatus} from '@nestjs/common';
 import {ApiBody, ApiOperation, ApiResponse} from '@nestjs/swagger';
 import {ErrorMessages} from '@/const/errors.const';
 import {SuccessMessages} from '@/const/success.const';
-import {JwtI, JwtPayloadI} from '@/types/jwt.interface';
+import {JwtI, JwtPayloadI, TokensI} from '@/types/jwt.interface';
 import {createUserDto} from '../dto/createUser.dto';
 import {loginUserDto} from '../dto/loginUser.dto';
 
@@ -24,6 +24,23 @@ export const UserSwagger = {
       ApiResponse({status: HttpStatus.UNAUTHORIZED, description: ErrorMessages.INVALID_CREDENTIALS}),
       ApiOperation({summary: 'Login user'}),
       ApiBody({type: loginUserDto})
+    ),
+  logout: () =>
+    applyDecorators(
+      ApiResponse({
+        status: HttpStatus.NO_CONTENT,
+        description: SuccessMessages.SUCCESS
+      }),
+      ApiOperation({summary: 'Logout user'})
+    ),
+  refresh: () =>
+    applyDecorators(
+      ApiResponse({
+        status: HttpStatus.OK,
+        description: SuccessMessages.SUCCESS,
+        type: TokensI
+      }),
+      ApiOperation({summary: 'Refresh tokens'})
     ),
   current: () =>
     applyDecorators(

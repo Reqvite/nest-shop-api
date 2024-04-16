@@ -1,4 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
+import {Schema} from 'mongoose';
 
 export class JwtI {
   @ApiProperty({
@@ -14,5 +15,25 @@ export class JwtPayloadI {
     example: '661d1fd7fca08b6a72d2440e',
     required: true
   })
-  _id: string;
+  _id: Schema.Types.ObjectId;
+}
+
+export class JwtPayloadWithRefreshI {
+  @ApiProperty({
+    example: '661d1fd7fca08b6a72d2440e',
+    required: true
+  })
+  _id: Schema.Types.ObjectId;
+  refreshToken: string;
+}
+
+export class TokensI {
+  @ApiProperty({
+    example: '661d1fd7fca08b6a72d2440e'
+  })
+  accessToken: string;
+  @ApiProperty({
+    example: '661d1fd7fca08b6a72d2440e'
+  })
+  refreshToken: string;
 }

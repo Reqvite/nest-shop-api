@@ -21,6 +21,9 @@ export class User {
 
   @Prop()
   phoneNumber: string;
+
+  @Prop()
+  refreshToken?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
