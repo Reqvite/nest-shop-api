@@ -6,7 +6,7 @@ import {JwtI, JwtPayloadI} from '@/types/jwt.interface';
 import {createUserDto} from '../dto/createUser.dto';
 import {loginUserDto} from '../dto/loginUser.dto';
 
-export const AuthSwagger = {
+export const UserSwagger = {
   register: () =>
     applyDecorators(
       ApiResponse({status: HttpStatus.CREATED, description: SuccessMessages.SUCCESS, type: createUserDto}),

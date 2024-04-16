@@ -3,23 +3,23 @@ import {ApiTags} from '@nestjs/swagger';
 import {Request} from 'express';
 import {YupValidationPipe} from '@/pipes/yupValidation.pipe';
 import {JwtI, JwtPayloadI} from '@/types/jwt.interface';
-import {AuthService} from './auth.service';
 import {createUserDto} from './dto/createUser.dto';
 import {loginUserDto} from './dto/loginUser.dto';
 import {JwtAuthGuard} from './guards/jwt.guard';
 import {User} from './model/user.model';
-import {AuthSwagger} from './swagger/auth.swagger';
+import {UserSwagger} from './swagger/user.swagger';
+import {UserService} from './user.service';
 import {createUserSchema} from './validation/createUser.schema';
 import {loginUserSchema} from './validation/loginUser.schema';
 
-@ApiTags('Auth')
-@Controller('auth')
-export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+@ApiTags('User')
+@Controller('user')
+export class UserController {
+  constructor(private readonly authService: UserService) {}
 
   @UsePipes(new YupValidationPipe(createUserSchema))
   @Post('register')
-  @AuthSwagger.register()
+  @UserSwagger.register()
   async register(@Body() dto: createUserDto): Promise<User> {
     return this.authService.register(dto);
   }
@@ -27,7 +27,7 @@ export class AuthController {
   @UsePipes(new YupValidationPipe(loginUserSchema))
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  @AuthSwagger.login()
+  @UserSwagger.login()
   async login(@Body() dto: loginUserDto): Promise<JwtI> {
     const user = await this.authService.validateUser(dto);
 
@@ -36,7 +36,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('current')
-  @AuthSwagger.current()
+  @UserSwagger.current()
   async currentUser(@Req() req: Request): Promise<JwtPayloadI> {
     return req.user as JwtPayloadI;
   }
