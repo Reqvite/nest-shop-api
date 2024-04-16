@@ -8,5 +8,8 @@ export const ErrorMessages = {
   INVALID_OBJECT_ID: 'Invalid object ID provided.',
   USER_ALREADY_EXISTS: 'User already exists.',
   INVALID_CREDENTIALS: 'Invalid credentials.',
-  ERROR: 'Error'
+  ERROR: 'Error',
+  MIN_LENGTH: ({length, label}: {length: number; label?: string}) =>
+    `${label ? label : 'Minimum'} length should be ${length} characters`,
+  INVALID_PHONE_FORMAT: (length?: number) => `Phone must contain ${length ? length : 12} digits`
 };
