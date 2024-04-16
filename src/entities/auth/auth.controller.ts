@@ -22,9 +22,9 @@ export class AuthController {
     return this.authService.register(dto);
   }
 
+  @Post('login')
   @UsePipes(new YupValidationPipe(loginUserSchema))
   @HttpCode(HttpStatus.OK)
-  @Post('login')
   @AuthSwagger.login()
   async login(@Body() dto: loginUserDto): Promise<JwtI> {
     const user = await this.authService.validateUser(dto);
