@@ -4,11 +4,11 @@ import {JwtModule} from '@nestjs/jwt';
 import {MongooseModule} from '@nestjs/mongoose';
 import {PassportModule} from '@nestjs/passport';
 import {jwtConfig} from '@/configuration/jwt.config';
+import {AuthController} from './auth.controller';
+import {AuthService} from './auth.service';
 import {User, UserSchema} from './model/user.model';
 import {AccessTokenStrategy} from './strategies/accessToken.strategy';
 import {RefreshTokenStrategy} from './strategies/refreshToken.strategy';
-import {UserController} from './user.controller';
-import {UserService} from './user.service';
 
 @Module({
   imports: [
@@ -17,7 +17,7 @@ import {UserService} from './user.service';
     PassportModule,
     ConfigModule
   ],
-  controllers: [UserController],
-  providers: [UserService, AccessTokenStrategy, RefreshTokenStrategy]
+  controllers: [AuthController],
+  providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy]
 })
-export class UserModule {}
+export class AuthModule {}
