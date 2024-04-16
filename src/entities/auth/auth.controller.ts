@@ -15,8 +15,8 @@ import {loginUserSchema} from './validation/loginUser.schema';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @UsePipes(new YupValidationPipe(createUserSchema))
   @Post('register')
+  @UsePipes(new YupValidationPipe(createUserSchema))
   @AuthSwagger.register()
   async register(@Body() dto: createUserDto): Promise<User> {
     return this.authService.register(dto);

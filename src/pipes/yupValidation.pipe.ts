@@ -9,9 +9,9 @@ export class YupValidationPipe<T> implements PipeTransform<T> {
   async transform(value: T) {
     try {
       await this.schema.validate(value, {abortEarly: false});
-    } catch (err) {
-      if (err instanceof ValidationError) {
-        throw CustomErrors.BadRequestError(err.errors.join(', '));
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        throw CustomErrors.BadRequestError(error.errors.join(', '));
       } else {
         throw CustomErrors.BadRequestError();
       }
