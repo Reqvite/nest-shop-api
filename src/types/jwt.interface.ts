@@ -29,11 +29,13 @@ export class JwtPayloadWithRefreshI {
 
 export class TokensI {
   @ApiProperty({
-    example: '661d1fd7fca08b6a72d2440e'
+    example:
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjFkMTFlNzVmMWNiMDRkYjVjODk0YjciLCJpYXQiOjE3MTMxOTExNTh9.RzBXtnYt-_S5jT78aQENTeywPGftHX0jT7rnY7pOQOw'
   })
   accessToken: string;
   @ApiProperty({
-    example: '661d1fd7fca08b6a72d2440e'
+    example:
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjFkMTFlNzVmMWNiMDRkYjVjODk0YjciLCJpYXQiOjE3MTMxOTExNTh9.RzBXtnYt-_S5jT78aQENTeywPGftHX0jT7rnY7pOQOw'
   })
   refreshToken: string;
 }

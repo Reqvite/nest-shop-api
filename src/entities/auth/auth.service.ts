@@ -8,6 +8,7 @@ import {TokensI} from '@/types/jwt.interface';
 import {ErrorMessages} from '../../const/errors.const';
 import {CustomErrors} from '../../utils/customErrors.utils';
 import {createUserDto} from './dto/createUser.dto';
+import {UserWithoutPasswordDto} from './dto/userWithoutPassrowd.dto';
 import {User} from './model/user.model';
 
 @Injectable()
@@ -34,15 +35,15 @@ export class AuthService {
     return tokens;
   }
 
-  async login(user: User): Promise<TokensI> {
+  async login(user: User) {
     const tokens = await this.getTokens(user._id);
     await this.updateRefreshToken(user._id, tokens.refreshToken);
 
-    return tokens;
+    return {user: new UserWithoutPasswordDto(user), tokens};
   }
 
-  async logout(userId: Schema.Types.ObjectId): Promise<void> {
-    await this.userModel.findByIdAndUpdate(userId, {refreshToken: null});
+  async currentUser(userId: Schema.Types.ObjectId): Promise<UserWithoutPasswordDto> {
+    return await this.userModel.findOne({_id: userId}).select('email firstName lastName');
   }
 
   async refreshTokens(userId: Schema.Types.ObjectId, refreshToken: string): Promise<TokensI> {

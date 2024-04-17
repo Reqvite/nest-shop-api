@@ -2,9 +2,11 @@ import {applyDecorators, HttpStatus} from '@nestjs/common';
 import {ApiBody, ApiOperation, ApiResponse} from '@nestjs/swagger';
 import {ErrorMessages} from '@/const/errors.const';
 import {SuccessMessages} from '@/const/success.const';
-import {JwtI, JwtPayloadI, TokensI} from '@/types/jwt.interface';
+import {TokensI} from '@/types/jwt.interface';
+import {UserLoginResponseI} from '@/types/userResponse.interface';
 import {createUserDto} from '../dto/createUser.dto';
 import {loginUserDto} from '../dto/loginUser.dto';
+import {UserWithoutPasswordDto} from '../dto/userWithoutPassrowd.dto';
 
 export const AuthSwagger = {
   register: () =>
@@ -19,19 +21,11 @@ export const AuthSwagger = {
       ApiResponse({
         status: HttpStatus.OK,
         description: SuccessMessages.SUCCESS,
-        type: JwtI
+        type: UserLoginResponseI
       }),
       ApiResponse({status: HttpStatus.UNAUTHORIZED, description: ErrorMessages.INVALID_CREDENTIALS}),
       ApiOperation({summary: 'Login user'}),
       ApiBody({type: loginUserDto})
-    ),
-  logout: () =>
-    applyDecorators(
-      ApiResponse({
-        status: HttpStatus.NO_CONTENT,
-        description: SuccessMessages.SUCCESS
-      }),
-      ApiOperation({summary: 'Logout user'})
     ),
   refresh: () =>
     applyDecorators(
@@ -47,7 +41,7 @@ export const AuthSwagger = {
       ApiResponse({
         status: HttpStatus.OK,
         description: SuccessMessages.SUCCESS,
-        type: JwtPayloadI
+        type: UserWithoutPasswordDto
       }),
       ApiResponse({status: HttpStatus.UNAUTHORIZED, description: ErrorMessages.UNAUTHORIZED}),
       ApiOperation({summary: 'Get current user'})
