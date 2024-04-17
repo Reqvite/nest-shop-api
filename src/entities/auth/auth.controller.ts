@@ -48,4 +48,12 @@ export class AuthController {
   async currentUser(@GetCurrentUser() user: JwtPayloadI): Promise<UserWithoutPasswordDto> {
     return this.authService.currentUser(user._id);
   }
+
+  @Post('logout')
+  @UseGuards(AccessAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @AuthSwagger.logout()
+  async logout(@GetCurrentUser() user: JwtPayloadI): Promise<void> {
+    return await this.authService.logout(user._id);
+  }
 }

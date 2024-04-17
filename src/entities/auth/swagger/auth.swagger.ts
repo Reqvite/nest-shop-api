@@ -45,5 +45,13 @@ export const AuthSwagger = {
       }),
       ApiResponse({status: HttpStatus.UNAUTHORIZED, description: ErrorMessages.UNAUTHORIZED}),
       ApiOperation({summary: 'Get current user'})
+    ),
+  logout: () =>
+    applyDecorators(
+      ApiResponse({
+        status: HttpStatus.NO_CONTENT,
+        description: SuccessMessages.SUCCESS
+      }),
+      ApiOperation({summary: 'Logout user'})
     )
 };

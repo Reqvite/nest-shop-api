@@ -46,6 +46,10 @@ export class AuthService {
     return await this.userModel.findOne({_id: userId}).select('email firstName lastName');
   }
 
+  async logout(userId: Schema.Types.ObjectId): Promise<void> {
+    await this.userModel.findByIdAndUpdate(userId, {refreshToken: null});
+  }
+
   async refreshTokens(userId: Schema.Types.ObjectId, refreshToken: string): Promise<TokensI> {
     const user = await this.userModel.findOne({_id: userId});
     if (!user || !user.refreshToken) {
