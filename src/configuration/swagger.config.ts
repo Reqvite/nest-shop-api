@@ -7,4 +7,5 @@ export const swaggerConfig = (url: string): Omit<OpenAPIObject, 'paths'> =>
     .setVersion('0.1')
     .addServer(url)
     .addTag('Your API Tag')
+    .addBearerAuth(undefined, 'BearerAuth')
     .build();
