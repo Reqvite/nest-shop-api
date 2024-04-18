@@ -51,7 +51,7 @@ export class AuthController {
 
   @Post('logout')
   @UseGuards(AccessAuthGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.OK)
   @AuthSwagger.logout()
   async logout(@GetCurrentUser() user: JwtPayloadI): Promise<void> {
     return await this.authService.logout(user._id);
