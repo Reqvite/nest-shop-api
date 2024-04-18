@@ -2,7 +2,7 @@ import {ApiProperty} from '@nestjs/swagger';
 import {ObjectId} from 'mongoose';
 import {User} from '../model/user.model';
 
-export class UserWithoutPasswordDto {
+export class UserResponseDto {
   @ApiProperty({
     example: '661d1fd7fca08b6a72d2440e',
     required: true
