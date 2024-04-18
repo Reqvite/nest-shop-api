@@ -20,7 +20,7 @@ export class User {
   @Prop({required: true})
   password: string;
 
-  @Prop({minlength: nameMinLength, maxlength: nameMaxLength})
+  @Prop()
   phoneNumber: string;
 
   @Prop()
