@@ -5,13 +5,12 @@ export type UserDocument = HydratedDocument<User>;
 
 @Schema({timestamps: true, versionKey: false})
 export class User {
-  @Prop()
   _id: MongooseSchema.Types.ObjectId;
 
-  @Prop({required: true})
+  @Prop({required: true, minlength: 3, maxlength: 30})
   firstName: string;
 
-  @Prop({required: true})
+  @Prop({required: true, minlength: 3, maxlength: 30})
   lastName: string;
 
   @Prop({unique: true, required: true})
@@ -20,8 +19,11 @@ export class User {
   @Prop({required: true})
   password: string;
 
-  @Prop()
+  @Prop({minlength: 3, maxlength: 30})
   phoneNumber: string;
+
+  @Prop()
+  refreshToken?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

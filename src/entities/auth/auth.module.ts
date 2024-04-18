@@ -7,7 +7,8 @@ import {jwtConfig} from '@/configuration/jwt.config';
 import {AuthController} from './auth.controller';
 import {AuthService} from './auth.service';
 import {User, UserSchema} from './model/user.model';
-import {JwtStrategy} from './strategies/jwt.strategy';
+import {AccessTokenStrategy} from './strategies/accessToken.strategy';
+import {RefreshTokenStrategy} from './strategies/refreshToken.strategy';
 
 @Module({
   imports: [
@@ -17,6 +18,6 @@ import {JwtStrategy} from './strategies/jwt.strategy';
     ConfigModule
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy]
+  providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy]
 })
 export class AuthModule {}

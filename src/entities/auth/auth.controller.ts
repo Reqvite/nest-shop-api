@@ -1,11 +1,13 @@
-import {Body, Controller, HttpCode, HttpStatus, Post, UsePipes} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards, UsePipes} from '@nestjs/common';
 import {ApiTags} from '@nestjs/swagger';
+import {GetCurrentUser} from '@/commons/decorators/getCurrentUser.decorator';
 import {YupValidationPipe} from '@/pipes/yupValidation.pipe';
-import {JwtI} from '@/types/jwt.interface';
+import {JwtPayloadI, JwtPayloadWithRefreshI, TokensI} from '@/types/jwt.interface';
+import {AccessAuthGuard, RefreshAuthGuard} from '../../commons/guards/jwt.guard';
 import {AuthService} from './auth.service';
 import {createUserDto} from './dto/createUser.dto';
 import {loginUserDto} from './dto/loginUser.dto';
-import {User} from './model/user.model';
+import {UserResponseDto} from './dto/userResponse.dto';
 import {AuthSwagger} from './swagger/auth.swagger';
 import {createUserSchema} from './validation/createUser.schema';
 import {loginUserSchema} from './validation/loginUser.schema';
@@ -18,17 +20,32 @@ export class AuthController {
   @Post('register')
   @UsePipes(new YupValidationPipe(createUserSchema))
   @AuthSwagger.register()
-  async register(@Body() dto: createUserDto): Promise<User> {
-    return this.authService.register(dto);
+  async register(@Body() dto: createUserDto): Promise<TokensI> {
+    return await this.authService.register(dto);
   }
 
   @Post('login')
   @UsePipes(new YupValidationPipe(loginUserSchema))
   @HttpCode(HttpStatus.OK)
   @AuthSwagger.login()
-  async login(@Body() dto: loginUserDto): Promise<JwtI> {
+  async login(@Body() dto: loginUserDto) {
     const user = await this.authService.validateUser(dto);
 
     return this.authService.login(user);
+  }
+
+  @Post('refresh')
+  @UseGuards(RefreshAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @AuthSwagger.refresh()
+  async refreshTokens(@GetCurrentUser() user: JwtPayloadWithRefreshI) {
+    return this.authService.refreshTokens(user._id, user.refreshToken);
+  }
+
+  @Get('current')
+  @UseGuards(AccessAuthGuard)
+  @AuthSwagger.current()
+  async currentUser(@GetCurrentUser() user: JwtPayloadI): Promise<UserResponseDto> {
+    return this.authService.currentUser(user._id);
   }
 }

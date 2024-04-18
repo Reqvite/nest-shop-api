@@ -1,1 +1,2 @@
-export const SECONDS_IN_A_DAY = 24 * 60 * 60;
+export const REFRESH_TOKEN_EXPIRED_TIME = 24 * 60 * 60;
+export const ACCESS_TOKEN_EXPIRED_TIME = 24 * 60;
