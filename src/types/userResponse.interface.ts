@@ -1,5 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {UserWithoutPasswordDto} from '@/entities/auth/dto/userWithoutPassrowd.dto';
+import {UserResponseDto} from '@/entities/auth/dto/userResponse.dto';
 import {TokensI} from './jwt.interface';
 
 export class UserLoginResponseI {
@@ -12,7 +12,7 @@ export class UserLoginResponseI {
     },
     required: true
   })
-  user: UserWithoutPasswordDto;
+  user: UserResponseDto;
 
   @ApiProperty({
     example: {

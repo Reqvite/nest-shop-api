@@ -1,12 +1,12 @@
 import {applyDecorators, HttpStatus} from '@nestjs/common';
-import {ApiBody, ApiOperation, ApiResponse} from '@nestjs/swagger';
+import {ApiBearerAuth, ApiBody, ApiOperation, ApiResponse} from '@nestjs/swagger';
 import {ErrorMessages} from '@/const/errors.const';
 import {SuccessMessages} from '@/const/success.const';
 import {TokensI} from '@/types/jwt.interface';
 import {UserLoginResponseI} from '@/types/userResponse.interface';
 import {createUserDto} from '../dto/createUser.dto';
 import {loginUserDto} from '../dto/loginUser.dto';
-import {UserWithoutPasswordDto} from '../dto/userWithoutPassrowd.dto';
+import {UserResponseDto} from '../dto/userResponse.dto';
 
 export const AuthSwagger = {
   register: () =>
@@ -41,8 +41,9 @@ export const AuthSwagger = {
       ApiResponse({
         status: HttpStatus.OK,
         description: SuccessMessages.SUCCESS,
-        type: UserWithoutPasswordDto
+        type: UserResponseDto
       }),
+      ApiBearerAuth(),
       ApiResponse({status: HttpStatus.UNAUTHORIZED, description: ErrorMessages.UNAUTHORIZED}),
       ApiOperation({summary: 'Get current user'})
     ),
