@@ -14,6 +14,7 @@ import {productSchema} from './validation/product.schema';
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
   @Post()
+  @UseGuards(AccessAuthGuard)
   @UsePipes(new YupValidationPipe(productSchema))
   @ProductSwagger.create()
   async create(@Body() dto: Omit<CreateProductDto, '_id'>): Promise<Product> {
