@@ -6,12 +6,14 @@ import {envConfiguration} from '@/configuration/env.config';
 import {loggerConfiguration} from '@/configuration/logger.config';
 import {mongoConfig} from '@/configuration/mongo.config';
 import {AuthModule} from '../auth/auth.module';
+import {ProductModule} from '../product/product.module';
 import {AppController} from './app.controller';
 import {AppService} from './app.service';
 
 @Module({
   imports: [
     AuthModule,
+    ProductModule,
     MongooseModule.forRootAsync(mongoConfig),
     LoggerModule.forRoot(loggerConfiguration),
     ConfigModule.forRoot(envConfiguration)
