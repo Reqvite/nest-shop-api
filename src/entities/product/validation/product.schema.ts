@@ -1,12 +1,12 @@
 import * as yup from 'yup';
-import {characteristicsValidation, minMaxTextLength, optionsValidation} from '../const/validation.const';
+import {characteristicsValidation, minMaxTextLength, optionsValidation, ratingValue} from '../const/validation.const';
 
 export const productSchema = yup.object().shape({
   image: yup.array().of(yup.string().url().required()).min(1).required(),
   title: minMaxTextLength,
   description: optionsValidation,
   brand: minMaxTextLength,
-  rating: yup.number().min(0).max(5),
+  rating: ratingValue,
   price: yup.number().positive().required(),
   discount: yup.number().min(0).max(100),
   quantity: yup.number().integer().min(0),
