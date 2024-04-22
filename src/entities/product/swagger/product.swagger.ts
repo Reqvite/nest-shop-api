@@ -7,7 +7,7 @@ export const ProductSwagger = {
   create: () =>
     applyDecorators(
       ApiResponse({status: HttpStatus.CREATED, description: SuccessMessages.SUCCESS, type: CreateProductDto}),
-      ApiBearerAuth('BearerAuth'),
+      ApiBearerAuth(),
       ApiOperation({summary: 'Product create'}),
       ApiBody({type: CreateProductDto})
     )
