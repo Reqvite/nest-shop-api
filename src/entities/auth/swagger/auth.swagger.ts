@@ -3,7 +3,7 @@ import {ApiBearerAuth, ApiBody, ApiOperation, ApiResponse} from '@nestjs/swagger
 import {ErrorMessages} from '@/const/errors.const';
 import {SuccessMessages} from '@/const/success.const';
 import {TokensI} from '@/types/jwt.interface';
-import {UserLoginResponseI} from '@/types/userResponse.interface';
+import {UserLoginResponseI} from '@/types/user.interface';
 import {createUserDto} from '../dto/createUser.dto';
 import {loginUserDto} from '../dto/loginUser.dto';
 import {UserResponseDto} from '../dto/userResponse.dto';
