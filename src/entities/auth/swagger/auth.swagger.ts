@@ -43,7 +43,7 @@ export const AuthSwagger = {
         description: SuccessMessages.SUCCESS,
         type: UserResponseDto
       }),
-      ApiBearerAuth('BearerAuth'),
+      ApiBearerAuth(),
       ApiResponse({status: HttpStatus.UNAUTHORIZED, description: ErrorMessages.UNAUTHORIZED}),
       ApiOperation({summary: 'Get current user'})
     ),

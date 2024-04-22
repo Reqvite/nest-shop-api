@@ -1,13 +1,13 @@
 import * as yup from 'yup';
+import {yupValidation} from '@/const/validation.const';
 
-const minMaxTextLength = yup.string().min(3).max(30).required();
-const descriptionValue = yup.string().min(3).max(300).required();
+const minMaxTextLength = yupValidation.getMinMaxString({min: 3, max: 30});
 const optionsValidation = yup.array().of(
   yup
     .object()
     .shape({
       label: minMaxTextLength,
-      value: descriptionValue
+      value: yupValidation.getMinMaxString({min: 3, max: 300})
     })
     .required()
 );
