@@ -23,6 +23,12 @@ export class ProductController {
     return this.productService.getProducts(params);
   }
 
+  @Get(':id')
+  @ProductSwagger.getProductById()
+  async getProductById(@Param('id', new ObjectIdValidationPipe()) id: string): Promise<Product> {
+    return this.productService.getProductById(id);
+  }
+
   @Post()
   @UseGuards(AccessAuthGuard)
   @UsePipes(new YupValidationPipe(productSchema))
