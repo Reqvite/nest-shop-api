@@ -8,7 +8,7 @@ export const getProductsQueryParamsSchema = yup.object().shape({
   category: integerPositive,
   subCategory: integerPositive,
   rating: yupValidation.getMinMaxNumber({min: 0, max: 5, required: false}),
-  tags: yup.string(),
+  tags: yup.number(),
   sortBy: yupValidation.getIntegerPositive({min: 0, required: false}),
   search: yup.string()
 });

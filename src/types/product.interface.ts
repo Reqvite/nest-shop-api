@@ -56,8 +56,10 @@ interface ProductParamsI {
   category?: number;
   subCategory?: number;
   rating?: {$gte: number; $lt: number};
-  tags?: {$in: number[]};
-  $or?: any;
+  tags?: number;
+  $or?: {
+    [key: string]: {$regex: string; $options: string};
+  }[];
 }
 
 export {type ProductParamsI};

@@ -21,15 +21,14 @@ export const getQueryParams = ({
     if (category) query.category = category;
     if (subCategory) query.subCategory = subCategory;
     if (rating) query.rating = {$gte: numberRating, $lt: numberRating + 1};
-    if (tags && Array.isArray(JSON.parse(tags))) {
-      query.tags = {$in: JSON.parse(tags)};
-    }
+    if (tags) query.tags = Number(tags);
     if (search) {
+      const options = {$regex: search, $options: 'i'};
       query.$or = [
-        {title: {$regex: search, $options: 'i'}},
-        {brand: {$regex: search, $options: 'i'}},
-        {'description.label': {$regex: search, $options: 'i'}},
-        {'characteristics.label': {$regex: search, $options: 'i'}}
+        {title: options},
+        {brand: options},
+        {'description.label': options},
+        {'characteristics.label': options}
       ];
     }
   } catch (error) {
