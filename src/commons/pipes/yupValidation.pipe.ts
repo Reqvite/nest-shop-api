@@ -5,7 +5,6 @@ import {CustomErrors} from '@/utils/customErrors.utils';
 @Injectable()
 export class YupValidationPipe<T> implements PipeTransform<T> {
   constructor(private readonly schema: Schema<T>) {}
-
   async transform(value: T) {
     try {
       await this.schema.validate(value, {abortEarly: false});

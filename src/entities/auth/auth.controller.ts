@@ -1,7 +1,7 @@
 import {Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards, UsePipes} from '@nestjs/common';
 import {ApiTags} from '@nestjs/swagger';
 import {GetCurrentUser} from '@/commons/decorators/getCurrentUser.decorator';
-import {YupValidationPipe} from '@/pipes/yupValidation.pipe';
+import {YupValidationPipe} from '@/commons/pipes/yupValidation.pipe';
 import {JwtPayloadI, JwtPayloadWithRefreshI, TokensI} from '@/types/jwt.interface';
 import {AccessAuthGuard, RefreshAuthGuard} from '../../commons/guards/jwt.guard';
 import {AuthService} from './auth.service';

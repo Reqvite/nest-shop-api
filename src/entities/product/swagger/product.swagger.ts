@@ -10,5 +10,12 @@ export const ProductSwagger = {
       ApiBearerAuth(),
       ApiOperation({summary: 'Product create'}),
       ApiBody({type: CreateProductDto})
+    ),
+  updateById: () =>
+    applyDecorators(
+      ApiBearerAuth(),
+      ApiResponse({status: HttpStatus.OK, description: SuccessMessages.SUCCESS, type: CreateProductDto}),
+      ApiOperation({summary: 'Product update'}),
+      ApiBody({type: CreateProductDto})
     )
 };
