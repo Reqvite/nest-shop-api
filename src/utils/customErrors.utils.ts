@@ -14,7 +14,7 @@ export class CustomErrors {
     return new HttpException(message, HttpStatus.CONFLICT);
   }
 
-  static NotFoundError(message = ErrorMessages.NOT_FOUND) {
+  static NotFoundError(message = ErrorMessages.NOT_FOUND()) {
     return new HttpException(message, HttpStatus.NOT_FOUND);
   }
 

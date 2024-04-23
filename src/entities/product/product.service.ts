@@ -20,7 +20,7 @@ export class ProductService {
   async updateById(body: CreateProductDto, id: string): Promise<Product> {
     const product = await this.productModel.findByIdAndUpdate(id, body, {new: true});
     if (!product) {
-      throw CustomErrors.NotFoundError(ErrorMessages.PRODUCT_NOT_FOUND);
+      throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Product'));
     }
     return product;
   }
