@@ -1,15 +1,14 @@
 import * as yup from 'yup';
+import {yupValidation} from '@/const/validation.const';
 
-const integerPositive = yup.number().min(1).integer().positive();
-const minMaxTextLength = yup.string().min(3).max(30).required();
-const descriptionValue = yup.string().min(3).max(300).required();
-const ratingValue = yup.number().min(0).max(5);
+const integerPositive = yupValidation.getIntegerPositive({required: false});
+const minMaxTextLength = yupValidation.getMinMaxString({min: 3, max: 30});
 const optionsValidation = yup.array().of(
   yup
     .object()
     .shape({
       label: minMaxTextLength,
-      value: descriptionValue
+      value: yupValidation.getMinMaxString({min: 3, max: 300})
     })
     .required()
 );
@@ -23,4 +22,4 @@ const characteristicsValidation = yup.array().of(
     .required()
 );
 
-export {characteristicsValidation, integerPositive, minMaxTextLength, optionsValidation, ratingValue};
+export {characteristicsValidation, integerPositive, minMaxTextLength, optionsValidation};
