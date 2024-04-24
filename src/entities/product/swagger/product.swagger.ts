@@ -5,6 +5,11 @@ import {GetProductsResponseI} from '@/types/product.interface';
 import {CreateProductDto} from '../dto/createProduct.dto';
 
 export const ProductSwagger = {
+  getProductById: () =>
+    applyDecorators(
+      ApiResponse({status: HttpStatus.OK, description: SuccessMessages.SUCCESS, type: CreateProductDto}),
+      ApiOperation({summary: 'Get product by id'})
+    ),
   getProducts: () =>
     applyDecorators(
       ApiResponse({status: HttpStatus.OK, description: SuccessMessages.SUCCESS, type: GetProductsResponseI}),

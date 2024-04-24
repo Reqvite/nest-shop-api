@@ -18,6 +18,14 @@ export class ProductService {
     private readonly productModel: Model<Product>
   ) {}
 
+  async getProductById(id: string): Promise<Product> {
+    const product = await this.productModel.findById(id);
+    if (!product) {
+      throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Product'));
+    }
+    return product;
+  }
+
   async getProducts(params: ProductsQueryParamsSchemaType): Promise<GetProductsResponseI> {
     const {query, skip, pageIdx, itemsLimit} = getQueryParams(params);
     const sort = getProductsSortBy(params.orderBy, Number(params.order) as SortOrder);
