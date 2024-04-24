@@ -2,6 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {InjectModel} from '@nestjs/mongoose';
 import {Model} from 'mongoose';
 import {ErrorMessages} from '@/const/errors.const';
+import {SortOrder} from '@/enums/sortBy.enum';
 import {GetProductsResponseI} from '@/types/product.interface';
 import {CustomErrors} from '@/utils/customErrors.utils';
 import {CreateProductDto} from './dto/createProduct.dto';
@@ -27,7 +28,7 @@ export class ProductService {
 
   async getProducts(params: ProductsQueryParamsSchemaType): Promise<GetProductsResponseI> {
     const {query, skip, pageIdx, itemsLimit} = getQueryParams(params);
-    const sort = getProductsSortBy(Number(params.sortBy));
+    const sort = getProductsSortBy(params.orderBy, Number(params.order) as SortOrder);
 
     const productsPromise = this.productModel.find(query).sort(sort).skip(skip).limit(itemsLimit);
     const totalResultsPromise = this.productModel.countDocuments(query);

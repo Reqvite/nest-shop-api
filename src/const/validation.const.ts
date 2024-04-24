@@ -5,6 +5,8 @@ export const yupValidation = {
     required ? yup.string().min(min).max(max).required() : yup.string().min(min).max(max),
   getMinMaxNumber: ({min, max, required = true}: {min: number; max: number; required?: boolean}) =>
     required ? yup.number().min(min).max(max).required() : yup.string().min(min).max(max),
-  getIntegerPositive: ({min = 1, required = true}: {min?: number; required?: boolean}) =>
-    required ? yup.number().min(min).integer().positive().required() : yup.number().min(min).integer().positive()
+  getIntegerPositive: ({min = 1, max = 1000000, required = true}: {min?: number; max?: number; required?: boolean}) =>
+    required
+      ? yup.number().min(min).min(max).integer().positive().required()
+      : yup.number().min(min).min(max).integer().positive()
 };
