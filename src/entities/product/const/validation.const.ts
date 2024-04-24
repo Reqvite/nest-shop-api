@@ -1,7 +1,6 @@
 import * as yup from 'yup';
 import {yupValidation} from '@/const/validation.const';
 
-const integerPositive = yupValidation.getIntegerPositive({required: false});
 const minMaxTextLength = yupValidation.getMinMaxString({min: 3, max: 30});
 const optionsValidation = yup.array().of(
   yup
@@ -22,4 +21,4 @@ const characteristicsValidation = yup.array().of(
     .required()
 );
 
-export {characteristicsValidation, integerPositive, minMaxTextLength, optionsValidation};
+export {characteristicsValidation, minMaxTextLength, optionsValidation};
