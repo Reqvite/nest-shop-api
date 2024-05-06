@@ -53,13 +53,30 @@ export class GetProductsResponseI {
 }
 
 interface ProductParamsI {
+  brand?: {$in: number[]};
+  price?: {$gte: number; $lt: number};
   category?: number;
   subCategory?: number;
   rating?: {$gte: number; $lt: number};
-  tags?: number;
+  tags?: {$in: number[]};
   $or?: {
     [key: string]: {$regex: string; $options: string};
   }[];
 }
 
-export {type ProductParamsI};
+type ProductFilterKeys = {
+  page?: number;
+  limit?: number;
+  brand?: number[];
+  price?: number[];
+  category?: number;
+  subCategory?: number;
+  rating?: number;
+  search?: string;
+  tags?: number[];
+  $or?: {
+    [key: string]: {$regex: string; $options: string};
+  }[];
+};
+
+export {type ProductFilterKeys, type ProductParamsI};

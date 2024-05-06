@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import {yupValidation} from '@/const/validation.const';
 
-const minMaxTextLength = yupValidation.getMinMaxString({min: 3, max: 30});
+const minMaxTextLength = yupValidation.getMinMaxString({min: 3, max: 100});
 const optionsValidation = yup.array().of(
   yup
     .object()
