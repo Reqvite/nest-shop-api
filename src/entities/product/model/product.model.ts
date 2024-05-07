@@ -36,7 +36,7 @@ export class Product {
   quantity: number;
 
   @Prop({required: true})
-  brand: string;
+  brand: number;
 
   @Prop({required: true, enum: CategoriesEnum})
   category: number;

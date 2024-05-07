@@ -6,7 +6,7 @@ import {Model, Schema} from 'mongoose';
 import {ACCESS_TOKEN_EXPIRED_TIME, REFRESH_TOKEN_EXPIRED_TIME} from '@/const/jwt.const';
 import {TokensI} from '@/types/jwt.interface';
 import {ErrorMessages} from '../../const/errors.const';
-import {CustomErrors} from '../../utils/customErrors.utils';
+import {CustomErrors} from '../../services/customErrors.service';
 import {createUserDto} from './dto/createUser.dto';
 import {UserResponseDto} from './dto/userResponse.dto';
 import {User} from './model/user.model';

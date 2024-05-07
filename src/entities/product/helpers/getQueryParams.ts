@@ -1,27 +1,28 @@
+import {ErrorMessages} from '@/const/errors.const';
+import {decodeSearchParams} from '@/lib/helpers/searchParams.helper';
+import {CustomErrors} from '@/services/customErrors.service';
 import {ProductParamsI} from '@/types/product.interface';
-import {CustomErrors} from '@/utils/customErrors.utils';
 import {ProductsQueryParamsSchemaType} from '../validation/getProductsQueryParams.schema';
 
-export const getQueryParams = ({
-  page,
-  limit,
-  category,
-  subCategory,
-  rating,
-  tags,
-  search
-}: ProductsQueryParamsSchemaType) => {
-  const pageIdx = Number(page) || 1;
-  const itemsLimit = Number(limit) || 10;
-  const numberRating = Number(rating);
+const defaultPage = 1;
+const defaultLimit = 10;
+const minRating = 0;
+
+export const getQueryParams = (params: ProductsQueryParamsSchemaType) => {
+  const {page, limit, category, subCategory, rating, tags, search, price, brand} = decodeSearchParams(params);
+  const pageIdx = page || defaultPage;
+  const itemsLimit = limit || defaultLimit;
+  const numberRating = rating;
   const skip = (pageIdx - 1) * itemsLimit;
   const query: ProductParamsI = {};
 
   try {
-    if (category) query.category = category;
-    if (subCategory) query.subCategory = subCategory;
-    if (rating) query.rating = {$gte: numberRating, $lt: numberRating + 1};
-    if (tags) query.tags = Number(tags);
+    if (brand && Array.isArray(brand)) query.brand = {$in: brand};
+    if (tags && Array.isArray(tags)) query.tags = {$in: tags};
+    if (category && Array.isArray(category)) query.category = {$in: category};
+    if (subCategory && Array.isArray(subCategory)) query.subCategory = {$in: subCategory};
+    if (price && price[0] && price[1]) query.price = {$gte: price[0], $lt: price[1]};
+    if (rating !== undefined) query.rating = {$gte: minRating, $lt: numberRating + 1};
     if (search) {
       const options = {$regex: search, $options: 'i'};
       query.$or = [
@@ -32,7 +33,8 @@ export const getQueryParams = ({
       ];
     }
   } catch (error) {
-    throw CustomErrors.BadRequestError();
+    console.log(error);
+    throw CustomErrors.BadRequestError(ErrorMessages.INVALID_PARAMS);
   }
 
   return {query, skip, pageIdx, itemsLimit};

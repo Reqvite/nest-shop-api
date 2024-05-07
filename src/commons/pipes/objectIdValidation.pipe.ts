@@ -1,7 +1,7 @@
 import {Injectable, PipeTransform} from '@nestjs/common';
 import * as mongoose from 'mongoose';
 import {ErrorMessages} from '@/const/errors.const';
-import {CustomErrors} from '@/utils/customErrors.utils';
+import {CustomErrors} from '@/services/customErrors.service';
 
 @Injectable()
 export class ObjectIdValidationPipe implements PipeTransform<string> {

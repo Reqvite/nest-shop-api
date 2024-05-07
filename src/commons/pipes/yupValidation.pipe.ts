@@ -1,6 +1,6 @@
 import {Injectable, PipeTransform} from '@nestjs/common';
 import {Schema, ValidationError} from 'yup';
-import {CustomErrors} from '@/utils/customErrors.utils';
+import {CustomErrors} from '@/services/customErrors.service';
 
 @Injectable()
 export class YupValidationPipe<T> implements PipeTransform<T> {
