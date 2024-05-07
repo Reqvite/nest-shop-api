@@ -66,8 +66,8 @@ export class GetProductsQuantityByCategoryResponseI {
 interface ProductParamsI {
   brand?: {$in: number[]};
   price?: {$gte: number; $lt: number};
-  category?: number;
-  subCategory?: number;
+  category?: {$in: number[]};
+  subCategory?: {$in: number[]};
   rating?: {$gte: number; $lt: number};
   tags?: {$in: number[]};
   $or?: {
@@ -92,8 +92,8 @@ type ProductFilterKeys = {
   limit?: number;
   brand?: number[];
   price?: number[];
-  category?: number;
-  subCategory?: number;
+  category?: number[];
+  subCategory?: number[];
   rating?: number;
   search?: string;
   tags?: number[];
