@@ -8,7 +8,7 @@ export const ErrorMessages = {
   INVALID_OBJECT_ID: 'Invalid object ID provided.',
   USER_ALREADY_EXISTS: 'User already exists.',
   INVALID_CREDENTIALS: 'Invalid credentials.',
-  INVALID_PARAMS: 'Invalid credentials.',
+  INVALID_PARAMS: 'Invalid params.',
   ERROR: 'Error',
   MIN_LENGTH: ({length, label}: {length: number; label?: string}) =>
     `${label ? label : 'Minimum'} length should be ${length} characters`,

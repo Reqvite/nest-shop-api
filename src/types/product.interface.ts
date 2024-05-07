@@ -55,8 +55,8 @@ export class GetProductsResponseI {
 interface ProductParamsI {
   brand?: {$in: number[]};
   price?: {$gte: number; $lt: number};
-  category?: number;
-  subCategory?: number;
+  category?: {$in: number[]};
+  subCategory?: {$in: number[]};
   rating?: {$gte: number; $lt: number};
   tags?: {$in: number[]};
   $or?: {
