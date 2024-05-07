@@ -3,7 +3,7 @@ import {ApiTags} from '@nestjs/swagger';
 import {AccessAuthGuard} from '@/commons/guards/jwt.guard';
 import {ObjectIdValidationPipe} from '@/commons/pipes/objectIdValidation.pipe';
 import {YupValidationPipe} from '@/commons/pipes/yupValidation.pipe';
-import {GetProductsResponseI} from '@/types/product.interface';
+import {GetProductsQuantityByCategoryResponseI, GetProductsResponseI} from '@/types/product.interface';
 import {CreateProductDto} from './dto/createProduct.dto';
 import {Product} from './model/product.model';
 import {ProductService} from './product.service';
@@ -27,6 +27,14 @@ export class ProductController {
   @ProductSwagger.getProductById()
   async getProductById(@Param('id', new ObjectIdValidationPipe()) id: string): Promise<Product> {
     return this.productService.getProductById(id);
+  }
+
+  @Get('categories/quantity')
+  @ProductSwagger.getProductsQuantityByCategories()
+  async getProductsQuantityByCategories(
+    @Query(new YupValidationPipe(getProductsQueryParamsSchema)) params: {[key: string]: string}
+  ): Promise<GetProductsQuantityByCategoryResponseI[]> {
+    return this.productService.getProductsQuantityByCategories(params);
   }
 
   @Post()

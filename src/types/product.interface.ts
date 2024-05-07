@@ -52,6 +52,29 @@ export class GetProductsResponseI {
   totalItems: number;
 }
 
+export class GetProductsQuantityByCategoryResponseI {
+  @ApiProperty({
+    example: 1
+  })
+  _id: number;
+  @ApiProperty({
+    example: 30
+  })
+  quantity: number;
+}
+
+interface ProductParamsI {
+  brand?: {$in: number[]};
+  price?: {$gte: number; $lt: number};
+  category?: {$in: number[]};
+  subCategory?: {$in: number[]};
+  rating?: {$gte: number; $lt: number};
+  tags?: {$in: number[]};
+  $or?: {
+    [key: string]: {$regex: string; $options: string};
+  }[];
+}
+
 interface ProductParamsI {
   brand?: {$in: number[]};
   price?: {$gte: number; $lt: number};
@@ -69,8 +92,8 @@ type ProductFilterKeys = {
   limit?: number;
   brand?: number[];
   price?: number[];
-  category?: number;
-  subCategory?: number;
+  category?: number[];
+  subCategory?: number[];
   rating?: number;
   search?: string;
   tags?: number[];
