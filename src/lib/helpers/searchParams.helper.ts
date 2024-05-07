@@ -5,7 +5,7 @@ const duplicateKeyRegex = /^(\w+)(\d+)$/;
 export const decodeSearchParams = (searchParams: Record<string, any>): ProductFilterKeys => {
   const urlSearchParams = new URLSearchParams(searchParams);
 
-  const decodedParams: Record<string, any> = {};
+  const decodedParams: Record<string, unknown> = {};
 
   [...urlSearchParams.entries()].forEach(([key, val]) => {
     const match = key.match(duplicateKeyRegex);

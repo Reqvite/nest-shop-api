@@ -19,8 +19,8 @@ export const getQueryParams = (params: ProductsQueryParamsSchemaType) => {
   try {
     if (brand && Array.isArray(brand)) query.brand = {$in: brand};
     if (tags && Array.isArray(tags)) query.tags = {$in: tags};
-    if (category) query.category = category;
-    if (subCategory) query.subCategory = subCategory;
+    if (category && Array.isArray(category)) query.category = {$in: category};
+    if (subCategory && Array.isArray(subCategory)) query.subCategory = {$in: subCategory};
     if (price && price[0] && price[1]) query.price = {$gte: price[0], $lt: price[1]};
     if (rating !== undefined) query.rating = {$gte: minRating, $lt: numberRating + 1};
     if (search) {
