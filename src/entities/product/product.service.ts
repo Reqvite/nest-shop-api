@@ -3,8 +3,9 @@ import {InjectModel} from '@nestjs/mongoose';
 import {Model} from 'mongoose';
 import {ErrorMessages} from '@/const/errors.const';
 import {SortOrder} from '@/enums/sortBy.enum';
+import {decodeSearchParams} from '@/lib/helpers/searchParams.helper';
 import {CustomErrors} from '@/services/customErrors.service';
-import {GetProductsResponseI} from '@/types/product.interface';
+import {GetProductsQuantityByCategoryResponseI, GetProductsResponseI} from '@/types/product.interface';
 import {CreateProductDto} from './dto/createProduct.dto';
 import {getQueryParams} from './helpers/getQueryParams';
 import {getProductsSortBy} from './helpers/getSortBy';
@@ -48,6 +49,31 @@ export class ProductService {
       totalPages,
       totalItems: totalProducts
     };
+  }
+
+  async getProductsQuantityByCategories(
+    params: ProductsQueryParamsSchemaType
+  ): Promise<GetProductsQuantityByCategoryResponseI[]> {
+    const {category} = decodeSearchParams(params);
+    const aggregationPipeline = [];
+
+    if (category) {
+      aggregationPipeline.push({
+        $match: {
+          category: {$in: category}
+        }
+      });
+    }
+    aggregationPipeline.push({
+      $group: {
+        _id: '$category',
+        quantity: {$sum: 1}
+      }
+    });
+
+    const productQuantities = await this.productModel.aggregate(aggregationPipeline);
+
+    return productQuantities;
   }
 
   async create(dto: CreateProductDto): Promise<Product> {

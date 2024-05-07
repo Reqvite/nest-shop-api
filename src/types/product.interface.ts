@@ -52,6 +52,29 @@ export class GetProductsResponseI {
   totalItems: number;
 }
 
+export class GetProductsQuantityByCategoryResponseI {
+  @ApiProperty({
+    example: 1
+  })
+  _id: number;
+  @ApiProperty({
+    example: 30
+  })
+  quantity: number;
+}
+
+interface ProductParamsI {
+  brand?: {$in: number[]};
+  price?: {$gte: number; $lt: number};
+  category?: number;
+  subCategory?: number;
+  rating?: {$gte: number; $lt: number};
+  tags?: {$in: number[]};
+  $or?: {
+    [key: string]: {$regex: string; $options: string};
+  }[];
+}
+
 interface ProductParamsI {
   brand?: {$in: number[]};
   price?: {$gte: number; $lt: number};
