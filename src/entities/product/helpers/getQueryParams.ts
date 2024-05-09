@@ -6,13 +6,11 @@ import {ProductsQueryParamsSchemaType} from '../validation/getProductsQueryParam
 
 const defaultPage = 1;
 const defaultLimit = 10;
-const minRating = 0;
 
 export const getQueryParams = (params: ProductsQueryParamsSchemaType) => {
   const {page, limit, categories, subCategory, rating, tags, search, prices, brands} = decodeSearchParams(params);
   const pageIdx = page || defaultPage;
   const itemsLimit = limit || defaultLimit;
-  const numberRating = rating;
   const skip = (pageIdx - 1) * itemsLimit;
   const query: ProductParamsI = {};
 
@@ -22,7 +20,7 @@ export const getQueryParams = (params: ProductsQueryParamsSchemaType) => {
     if (categories && Array.isArray(categories)) query.category = {$in: categories};
     if (subCategory && Array.isArray(subCategory)) query.subCategory = {$in: subCategory};
     if (prices && prices[0] && prices[1]) query.price = {$gte: prices[0], $lt: prices[1]};
-    if (rating !== undefined) query.rating = {$gte: minRating, $lt: numberRating + 1};
+    if (rating && Array.isArray(rating)) query.rating = {$gte: rating[0], $lt: rating[1] + 1};
     if (search) {
       const options = {$regex: search, $options: 'i'};
       query.$or = [
