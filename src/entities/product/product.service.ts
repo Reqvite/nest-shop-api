@@ -54,13 +54,13 @@ export class ProductService {
   async getProductsQuantityByCategories(
     params: ProductsQueryParamsSchemaType
   ): Promise<GetProductsQuantityByCategoryResponseI[]> {
-    const {category} = decodeSearchParams(params);
+    const {categories} = decodeSearchParams(params);
     const aggregationPipeline = [];
 
-    if (category) {
+    if (categories) {
       aggregationPipeline.push({
         $match: {
-          category: {$in: category}
+          category: {$in: categories}
         }
       });
     }

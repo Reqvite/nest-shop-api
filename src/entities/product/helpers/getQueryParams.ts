@@ -9,7 +9,7 @@ const defaultLimit = 10;
 const minRating = 0;
 
 export const getQueryParams = (params: ProductsQueryParamsSchemaType) => {
-  const {page, limit, category, subCategory, rating, tags, search, price, brand} = decodeSearchParams(params);
+  const {page, limit, categories, subCategory, rating, tags, search, prices, brands} = decodeSearchParams(params);
   const pageIdx = page || defaultPage;
   const itemsLimit = limit || defaultLimit;
   const numberRating = rating;
@@ -17,11 +17,11 @@ export const getQueryParams = (params: ProductsQueryParamsSchemaType) => {
   const query: ProductParamsI = {};
 
   try {
-    if (brand && Array.isArray(brand)) query.brand = {$in: brand};
+    if (brands && Array.isArray(brands)) query.brand = {$in: brands};
     if (tags && Array.isArray(tags)) query.tags = {$in: tags};
-    if (category && Array.isArray(category)) query.category = {$in: category};
+    if (categories && Array.isArray(categories)) query.category = {$in: categories};
     if (subCategory && Array.isArray(subCategory)) query.subCategory = {$in: subCategory};
-    if (price && price[0] && price[1]) query.price = {$gte: price[0], $lt: price[1]};
+    if (prices && prices[0] && prices[1]) query.price = {$gte: prices[0], $lt: prices[1]};
     if (rating !== undefined) query.rating = {$gte: minRating, $lt: numberRating + 1};
     if (search) {
       const options = {$regex: search, $options: 'i'};

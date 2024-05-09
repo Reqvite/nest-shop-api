@@ -90,9 +90,9 @@ interface ProductParamsI {
 type ProductFilterKeys = {
   page?: number;
   limit?: number;
-  brand?: number[];
-  price?: number[];
-  category?: number[];
+  brands?: number[];
+  prices?: number[];
+  categories?: number[];
   subCategory?: number[];
   rating?: number;
   search?: string;
