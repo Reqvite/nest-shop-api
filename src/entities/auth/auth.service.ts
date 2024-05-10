@@ -43,7 +43,7 @@ export class AuthService {
   }
 
   async currentUser(userId: Schema.Types.ObjectId): Promise<UserResponseDto> {
-    return await this.userModel.findOne({_id: userId}).select('email firstName lastName');
+    return new UserResponseDto(await this.userModel.findOne({_id: userId}));
   }
 
   async logout(userId: Schema.Types.ObjectId): Promise<void> {

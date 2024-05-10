@@ -1,6 +1,7 @@
 import {applyDecorators, HttpStatus} from '@nestjs/common';
 import {ApiBearerAuth, ApiBody, ApiOperation, ApiQuery, ApiResponse} from '@nestjs/swagger';
 import {SuccessMessages} from '@/const/success.const';
+import {UserWishlistResponseDto} from '@/entities/auth/dto/userResponse.dto';
 import {GetProductsQuantityByCategoryResponseI} from '@/types/product.interface';
 import {CreateProductDto} from '../dto/createProduct.dto';
 
@@ -45,5 +46,11 @@ export const ProductSwagger = {
       ApiResponse({status: HttpStatus.OK, description: SuccessMessages.SUCCESS, type: CreateProductDto}),
       ApiOperation({summary: 'Product update'}),
       ApiBody({type: CreateProductDto})
+    ),
+  updateWishlist: () =>
+    applyDecorators(
+      ApiBearerAuth(),
+      ApiResponse({status: HttpStatus.OK, description: SuccessMessages.SUCCESS, type: UserWishlistResponseDto}),
+      ApiOperation({summary: 'Wishlist update'})
     )
 };

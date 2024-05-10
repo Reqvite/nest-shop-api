@@ -144,7 +144,7 @@
     "rating": 3,
     "price": 50,
     "quantity": 100,
-    "brand": 3,
+    "brand": 1,
     "category": 1,
     "subCategory": 1,
     "tags": [1, 6],
