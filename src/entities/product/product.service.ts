@@ -96,20 +96,28 @@ export class ProductService {
       throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Product'));
     }
 
-    let updatedUser = null;
+    let user = null;
 
-    const user = await this.userModel.findOneAndUpdate(
+    const userWithNewWishlistId = await this.userModel.findOneAndUpdate(
       {_id: userId, wishlist: {$ne: productId}},
       {$addToSet: {wishlist: productId}},
       {new: true}
     );
 
-    if (!user) {
-      updatedUser = await this.userModel.findByIdAndUpdate(userId, {$pull: {wishlist: productId}}, {new: true});
+    if (!userWithNewWishlistId) {
+      const userWithDeletedWishlistId = await this.userModel.findByIdAndUpdate(
+        userId,
+        {$pull: {wishlist: productId}},
+        {new: true}
+      );
+      if (!userWithDeletedWishlistId) {
+        throw CustomErrors.AuthorizationError();
+      }
+      user = userWithDeletedWishlistId;
     } else {
-      updatedUser = user;
+      user = userWithNewWishlistId;
     }
 
-    return updatedUser.wishlist;
+    return user.wishlist;
   }
 }

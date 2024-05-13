@@ -75,18 +75,6 @@ interface ProductParamsI {
   }[];
 }
 
-interface ProductParamsI {
-  brand?: {$in: number[]};
-  price?: {$gte: number; $lt: number};
-  category?: {$in: number[]};
-  subCategory?: {$in: number[]};
-  rating?: {$gte: number; $lt: number};
-  tags?: {$in: number[]};
-  $or?: {
-    [key: string]: {$regex: string; $options: string};
-  }[];
-}
-
 type ProductFilterKeys = {
   page?: number;
   limit?: number;
