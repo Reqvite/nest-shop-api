@@ -42,8 +42,8 @@ export class AuthService {
     return {user: new UserResponseDto(user), tokens};
   }
 
-  async currentUser(userId: Schema.Types.ObjectId): Promise<UserResponseDto> {
-    return await this.userModel.findOne({_id: userId}).select('email firstName lastName');
+  async currentUser(_id: Schema.Types.ObjectId): Promise<UserResponseDto> {
+    return new UserResponseDto(await this.userModel.findOne({_id}));
   }
 
   async logout(userId: Schema.Types.ObjectId): Promise<void> {

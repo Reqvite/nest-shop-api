@@ -1,18 +1,21 @@
 import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
-import {HydratedDocument, Schema as MongooseSchema} from 'mongoose';
+import {HydratedDocument, ObjectId, Schema as MongooseSchema} from 'mongoose';
 import {nameMaxLength, nameMinLength} from '../const/validation';
 
 export type UserDocument = HydratedDocument<User>;
 
 @Schema({timestamps: true, versionKey: false})
 export class User {
-  _id: MongooseSchema.Types.ObjectId;
+  _id: ObjectId;
 
   @Prop({required: true, minlength: nameMinLength, maxlength: nameMaxLength})
   firstName: string;
 
   @Prop({required: true, minlength: nameMinLength, maxlength: nameMaxLength})
   lastName: string;
+
+  @Prop({type: [{type: MongooseSchema.Types.ObjectId, ref: 'Product'}], default: []})
+  wishlist: ObjectId[];
 
   @Prop({unique: true, required: true})
   email: string;

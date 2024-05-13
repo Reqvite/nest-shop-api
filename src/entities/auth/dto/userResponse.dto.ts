@@ -27,10 +27,23 @@ export class UserResponseDto {
   })
   email: string;
 
+  @ApiProperty({
+    example: []
+  })
+  wishlist: ObjectId[];
+
   constructor(model: User) {
     this._id = model._id;
     this.email = model.email;
     this.firstName = model.firstName;
     this.lastName = model.lastName;
+    this.wishlist = model.wishlist;
   }
+}
+
+export class UserWishlistResponseDto {
+  @ApiProperty({
+    example: ['663cda9190ba9b627e6f729d']
+  })
+  wishlist: ObjectId[];
 }

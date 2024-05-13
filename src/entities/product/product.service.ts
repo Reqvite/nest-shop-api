@@ -1,11 +1,13 @@
 import {Injectable} from '@nestjs/common';
 import {InjectModel} from '@nestjs/mongoose';
-import {Model} from 'mongoose';
+import {Model, ObjectId} from 'mongoose';
 import {ErrorMessages} from '@/const/errors.const';
 import {SortOrder} from '@/enums/sortBy.enum';
 import {decodeSearchParams} from '@/lib/helpers/searchParams.helper';
 import {CustomErrors} from '@/services/customErrors.service';
 import {GetProductsQuantityByCategoryResponseI, GetProductsResponseI} from '@/types/product.interface';
+import {UserWishlistResponseDto} from '../auth/dto/userResponse.dto';
+import {User} from '../auth/model/user.model';
 import {CreateProductDto} from './dto/createProduct.dto';
 import {getQueryParams} from './helpers/getQueryParams';
 import {getProductsSortBy} from './helpers/getSortBy';
@@ -15,8 +17,8 @@ import {ProductsQueryParamsSchemaType} from './validation/getProductsQueryParams
 @Injectable()
 export class ProductService {
   constructor(
-    @InjectModel(Product.name)
-    private readonly productModel: Model<Product>
+    @InjectModel(Product.name) private readonly productModel: Model<Product>,
+    @InjectModel(User.name) private readonly userModel: Model<User>
   ) {}
 
   async getProductById(id: string): Promise<Product> {
@@ -86,5 +88,36 @@ export class ProductService {
       throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Product'));
     }
     return product;
+  }
+  async updateWishlist(productId: ObjectId, userId: ObjectId): Promise<UserWishlistResponseDto> {
+    const product = await this.productModel.findById(productId);
+
+    if (!product) {
+      throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Product'));
+    }
+
+    let user = null;
+
+    const userWithNewWishlistId = await this.userModel.findOneAndUpdate(
+      {_id: userId, wishlist: {$ne: productId}},
+      {$addToSet: {wishlist: productId}},
+      {new: true}
+    );
+
+    if (!userWithNewWishlistId) {
+      const userWithDeletedWishlistId = await this.userModel.findByIdAndUpdate(
+        userId,
+        {$pull: {wishlist: productId}},
+        {new: true}
+      );
+      if (!userWithDeletedWishlistId) {
+        throw CustomErrors.AuthorizationError();
+      }
+      user = userWithDeletedWishlistId;
+    } else {
+      user = userWithNewWishlistId;
+    }
+
+    return user.wishlist;
   }
 }

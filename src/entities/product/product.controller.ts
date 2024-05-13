@@ -1,9 +1,13 @@
-import {Body, Controller, Get, Param, Post, Put, Query, UseGuards, UsePipes} from '@nestjs/common';
+import {Body, Controller, Get, Param, Patch, Post, Put, Query, UseGuards, UsePipes} from '@nestjs/common';
 import {ApiTags} from '@nestjs/swagger';
+import {ObjectId} from 'mongoose';
+import {GetCurrentUser} from '@/commons/decorators/getCurrentUser.decorator';
 import {AccessAuthGuard} from '@/commons/guards/jwt.guard';
 import {ObjectIdValidationPipe} from '@/commons/pipes/objectIdValidation.pipe';
 import {YupValidationPipe} from '@/commons/pipes/yupValidation.pipe';
+import {JwtPayloadI} from '@/types/jwt.interface';
 import {GetProductsQuantityByCategoryResponseI, GetProductsResponseI} from '@/types/product.interface';
+import {UserWishlistResponseDto} from '../auth/dto/userResponse.dto';
 import {CreateProductDto} from './dto/createProduct.dto';
 import {Product} from './model/product.model';
 import {ProductService} from './product.service';
@@ -53,5 +57,15 @@ export class ProductController {
     @Param('id', new ObjectIdValidationPipe()) id: string
   ): Promise<Product> {
     return this.productService.updateById(dto, id);
+  }
+
+  @Patch(':id')
+  @UseGuards(AccessAuthGuard)
+  @ProductSwagger.updateWishlist()
+  async updateWishlist(
+    @Param('id', new ObjectIdValidationPipe()) id: ObjectId,
+    @GetCurrentUser() {_id: userId}: JwtPayloadI
+  ): Promise<UserWishlistResponseDto> {
+    return this.productService.updateWishlist(id, userId);
   }
 }
