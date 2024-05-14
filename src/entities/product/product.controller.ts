@@ -19,6 +19,16 @@ import {productSchema} from './validation/product.schema';
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
+  @Get('/wishlist')
+  @UseGuards(AccessAuthGuard)
+  @ProductSwagger.getUserWishlist()
+  async getUserWishlist(
+    @Query(new YupValidationPipe(getProductsQueryParamsSchema)) params: {[key: string]: string},
+    @GetCurrentUser() {_id: userId}: JwtPayloadI
+  ): Promise<GetProductsResponseI> {
+    return this.productService.getUserWishlist(params, userId);
+  }
+
   @Get()
   @ProductSwagger.getProducts()
   async getProducts(

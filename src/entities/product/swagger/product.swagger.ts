@@ -5,24 +5,28 @@ import {UserWishlistResponseDto} from '@/entities/auth/dto/userResponse.dto';
 import {GetProductsQuantityByCategoryResponseI} from '@/types/product.interface';
 import {CreateProductDto} from '../dto/createProduct.dto';
 
+const queryParams = (): (typeof ApiQuery)[] => [
+  ApiQuery({name: 'page', type: 'string', required: false}),
+  ApiQuery({name: 'limit', type: 'string', required: false}),
+  ApiQuery({name: 'categories', type: 'string', required: false}),
+  ApiQuery({name: 'brands', type: 'string', required: false}),
+  ApiQuery({name: 'prices', type: 'string', required: false}),
+  ApiQuery({name: 'subCategory', type: 'string', required: false}),
+  ApiQuery({name: 'rating', type: 'string', required: false}),
+  ApiQuery({name: 'tags', type: 'string', isArray: true, required: false}),
+  ApiQuery({name: 'sortBy', type: 'string', required: false}),
+  ApiQuery({name: 'search', type: 'string', required: false})
+];
+
 export const ProductSwagger = {
   getProductById: () =>
     applyDecorators(
       ApiResponse({status: HttpStatus.OK, description: SuccessMessages.SUCCESS, type: CreateProductDto}),
       ApiOperation({summary: 'Get product by id'})
     ),
-  getProducts: () =>
-    applyDecorators(
-      ApiQuery({name: 'page', type: 'number', required: false}),
-      ApiQuery({name: 'limit', type: 'number', required: false}),
-      ApiQuery({name: 'category', type: 'string', required: false}),
-      ApiQuery({name: 'subCategory', type: 'string', required: false}),
-      ApiQuery({name: 'rating', type: 'number', required: false}),
-      ApiQuery({name: 'tags', type: 'string', isArray: true, required: false}),
-      ApiQuery({name: 'sortBy', type: 'string', required: false}),
-      ApiQuery({name: 'search', type: 'string', required: false}),
-      ApiOperation({summary: 'Get products'})
-    ),
+  getUserWishlist: () =>
+    applyDecorators(ApiBearerAuth(), ...queryParams(), ApiOperation({summary: 'Get user wishlist'})),
+  getProducts: () => applyDecorators(...queryParams(), ApiOperation({summary: 'Get products'})),
   getProductsQuantityByCategories: () =>
     applyDecorators(
       ApiResponse({

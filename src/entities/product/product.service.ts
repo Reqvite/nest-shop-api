@@ -30,6 +30,45 @@ export class ProductService {
     return product;
   }
 
+  async getUserWishlist(params: ProductsQueryParamsSchemaType, userId: ObjectId): Promise<any> {
+    const {query, skip, pageIdx, itemsLimit} = getQueryParams(params);
+    const user = await this.userModel.findOne({_id: userId}).select('wishlist');
+    const sort = getProductsSortBy(params.orderBy, Number(params.order) as SortOrder);
+
+    const aggregationPipeline = [
+      discountedPriceAddField,
+      sort,
+      {
+        $match: {
+          _id: {$in: user.wishlist},
+          ...query
+        }
+      },
+      {$skip: skip},
+      {$limit: itemsLimit}
+    ];
+    const productsPromise = this.productModel.aggregate(aggregationPipeline);
+    const totalResultsPromise = this.productModel.countDocuments({
+      ...query,
+      _id: {$in: user.wishlist}
+    });
+    const minMaxPricesPromise = this.productModel.aggregate([discountedPriceAddField, minMaxPricesGroup]);
+    const [products, totalResults, minMaxPrices] = await Promise.all([
+      productsPromise,
+      totalResultsPromise,
+      minMaxPricesPromise
+    ]);
+    const totalPages = Math.ceil(totalResults / itemsLimit);
+
+    return {
+      results: products,
+      totalResults,
+      currentPage: pageIdx,
+      totalPages,
+      minMaxPrices: [minMaxPrices[0]?.minPrice, minMaxPrices[0]?.maxPrice]
+    };
+  }
+
   async getProducts(params: ProductsQueryParamsSchemaType): Promise<GetProductsResponseI> {
     const {query, skip, pageIdx, itemsLimit} = getQueryParams(params);
     const sort = getProductsSortBy(params.orderBy, Number(params.order) as SortOrder);
