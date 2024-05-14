@@ -50,6 +50,11 @@ export class GetProductsResponseI {
     example: 2000
   })
   totalItems: number;
+
+  @ApiProperty({
+    example: [1, 500]
+  })
+  minMaxPrices: number[];
 }
 
 export class GetProductsQuantityByCategoryResponseI {
@@ -65,7 +70,7 @@ export class GetProductsQuantityByCategoryResponseI {
 
 interface ProductParamsI {
   brand?: {$in: number[]};
-  price?: {$gte: number; $lt: number};
+  discountedPrice?: {$gte: number; $lt: number};
   category?: {$in: number[]};
   subCategory?: {$in: number[]};
   rating?: {$gte: number; $lt: number};

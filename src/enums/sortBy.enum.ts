@@ -1,1 +1,4 @@
-export type SortOrder = 1 | -1;
+export enum SortOrder {
+  ASC = 1,
+  DESC = -1
+}
