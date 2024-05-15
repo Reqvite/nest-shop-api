@@ -6,7 +6,11 @@ import {AccessAuthGuard} from '@/commons/guards/jwt.guard';
 import {ObjectIdValidationPipe} from '@/commons/pipes/objectIdValidation.pipe';
 import {YupValidationPipe} from '@/commons/pipes/yupValidation.pipe';
 import {JwtPayloadI} from '@/types/jwt.interface';
-import {GetProductsQuantityByCategoryResponseI, GetProductsResponseI} from '@/types/product.interface';
+import {
+  GetProductsQuantityByCategoryResponseI,
+  GetProductsResponseI,
+  GetWishlistResponseI
+} from '@/types/product.interface';
 import {UserWishlistResponseDto} from '../auth/dto/userResponse.dto';
 import {CreateProductDto} from './dto/createProduct.dto';
 import {Product} from './model/product.model';
@@ -25,7 +29,7 @@ export class ProductController {
   async getUserWishlist(
     @Query(new YupValidationPipe(getProductsQueryParamsSchema)) params: {[key: string]: string},
     @GetCurrentUser() {_id: userId}: JwtPayloadI
-  ): Promise<GetProductsResponseI> {
+  ): Promise<GetWishlistResponseI> {
     return this.productService.getUserWishlist(params, userId);
   }
 

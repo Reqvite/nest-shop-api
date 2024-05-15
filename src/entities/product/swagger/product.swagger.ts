@@ -2,7 +2,11 @@ import {applyDecorators, HttpStatus} from '@nestjs/common';
 import {ApiBearerAuth, ApiBody, ApiOperation, ApiQuery, ApiResponse} from '@nestjs/swagger';
 import {SuccessMessages} from '@/const/success.const';
 import {UserWishlistResponseDto} from '@/entities/auth/dto/userResponse.dto';
-import {GetProductsQuantityByCategoryResponseI} from '@/types/product.interface';
+import {
+  GetProductsQuantityByCategoryResponseI,
+  GetProductsResponseI,
+  GetWishlistResponseI
+} from '@/types/product.interface';
 import {CreateProductDto} from '../dto/createProduct.dto';
 
 const queryParams = (): (typeof ApiQuery)[] => [
@@ -25,8 +29,18 @@ export const ProductSwagger = {
       ApiOperation({summary: 'Get product by id'})
     ),
   getUserWishlist: () =>
-    applyDecorators(ApiBearerAuth(), ...queryParams(), ApiOperation({summary: 'Get user wishlist'})),
-  getProducts: () => applyDecorators(...queryParams(), ApiOperation({summary: 'Get products'})),
+    applyDecorators(
+      ApiBearerAuth(),
+      ...queryParams(),
+      ApiOperation({summary: 'Get user wishlist'}),
+      ApiResponse({status: HttpStatus.OK, description: SuccessMessages.SUCCESS, type: GetWishlistResponseI})
+    ),
+  getProducts: () =>
+    applyDecorators(
+      ...queryParams(),
+      ApiOperation({summary: 'Get products'}),
+      ApiResponse({status: HttpStatus.OK, description: SuccessMessages.SUCCESS, type: GetProductsResponseI})
+    ),
   getProductsQuantityByCategories: () =>
     applyDecorators(
       ApiResponse({

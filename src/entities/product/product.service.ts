@@ -5,7 +5,11 @@ import {ErrorMessages} from '@/const/errors.const';
 import {SortOrder} from '@/enums/sortBy.enum';
 import {decodeSearchParams} from '@/lib/helpers/searchParams.helper';
 import {CustomErrors} from '@/services/customErrors.service';
-import {GetProductsQuantityByCategoryResponseI, GetProductsResponseI} from '@/types/product.interface';
+import {
+  GetProductsQuantityByCategoryResponseI,
+  GetProductsResponseI,
+  GetWishlistResponseI
+} from '@/types/product.interface';
 import {UserWishlistResponseDto} from '../auth/dto/userResponse.dto';
 import {User} from '../auth/model/user.model';
 import {discountedPriceAddField, minMaxPricesGroup} from './const/pipelines.const';
@@ -30,7 +34,7 @@ export class ProductService {
     return product;
   }
 
-  async getUserWishlist(params: ProductsQueryParamsSchemaType, userId: ObjectId): Promise<any> {
+  async getUserWishlist(params: ProductsQueryParamsSchemaType, userId: ObjectId): Promise<GetWishlistResponseI> {
     const {query, skip, pageIdx, itemsLimit} = getQueryParams(params);
     const user = await this.userModel.findOne({_id: userId}).select('wishlist');
     const sort = getProductsSortBy(params.orderBy, Number(params.order) as SortOrder);
@@ -48,21 +52,27 @@ export class ProductService {
       {$limit: itemsLimit}
     ];
     const productsPromise = this.productModel.aggregate(aggregationPipeline);
-    const totalResultsPromise = this.productModel.countDocuments({
-      ...query,
-      _id: {$in: user.wishlist}
-    });
+    const totalResultsPromise = this.productModel.aggregate([
+      discountedPriceAddField,
+      {$match: {...query, _id: {$in: user.wishlist}}},
+      {
+        $group: {
+          _id: null,
+          count: {$sum: 1}
+        }
+      }
+    ]);
     const minMaxPricesPromise = this.productModel.aggregate([discountedPriceAddField, minMaxPricesGroup]);
     const [products, totalResults, minMaxPrices] = await Promise.all([
       productsPromise,
       totalResultsPromise,
       minMaxPricesPromise
     ]);
-    const totalPages = Math.ceil(totalResults / itemsLimit);
+    const totalPages = Math.ceil(totalResults[0].count / itemsLimit);
 
     return {
       results: products,
-      totalResults,
+      totalResults: totalResults[0].count,
       currentPage: pageIdx,
       totalPages,
       minMaxPrices: [minMaxPrices[0]?.minPrice, minMaxPrices[0]?.maxPrice]
@@ -75,7 +85,16 @@ export class ProductService {
 
     const aggregationPipeline = [discountedPriceAddField, sort, {$match: query}, {$skip: skip}, {$limit: itemsLimit}];
     const productsPromise = this.productModel.aggregate(aggregationPipeline);
-    const totalResultsPromise = this.productModel.countDocuments(query);
+    const totalResultsPromise = this.productModel.aggregate([
+      discountedPriceAddField,
+      {$match: query},
+      {
+        $group: {
+          _id: null,
+          count: {$sum: 1}
+        }
+      }
+    ]);
     const totalProductsPromise = this.productModel.countDocuments();
     const minMaxPricesPromise = this.productModel.aggregate([discountedPriceAddField, minMaxPricesGroup]);
     const [products, totalResults, totalProducts, minMaxPrices] = await Promise.all([
@@ -84,11 +103,11 @@ export class ProductService {
       totalProductsPromise,
       minMaxPricesPromise
     ]);
-    const totalPages = Math.ceil(totalResults / itemsLimit);
+    const totalPages = Math.ceil(totalResults[0].count / itemsLimit);
 
     return {
       results: products,
-      totalResults,
+      totalResults: totalResults[0].count,
       currentPage: pageIdx,
       totalPages,
       totalItems: totalProducts,
