@@ -68,11 +68,11 @@ export class ProductService {
       totalResultsPromise,
       minMaxPricesPromise
     ]);
-    const totalPages = Math.ceil(totalResults[0].count / itemsLimit);
+    const totalPages = Math.ceil(totalResults[0]?.count / itemsLimit);
 
     return {
       results: products,
-      totalResults: totalResults[0].count,
+      totalResults: totalResults[0]?.count,
       currentPage: pageIdx,
       totalPages,
       minMaxPrices: [minMaxPrices[0]?.minPrice, minMaxPrices[0]?.maxPrice]
