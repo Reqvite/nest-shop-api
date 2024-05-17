@@ -2,8 +2,12 @@ import * as yup from 'yup';
 import {yupValidation} from '@/const/validation.const';
 import {characteristicsValidation, minMaxTextLength, optionsValidation} from '../const/validation.const';
 
+const imgValidation = yup.object().shape({
+  src: yup.string().url().required()
+});
+
 export const productSchema = yup.object().shape({
-  image: yup.array().of(yup.string().url().required()).min(1).required(),
+  images: yup.array().of(imgValidation).min(1).required(),
   title: minMaxTextLength,
   description: optionsValidation,
   brand: yupValidation.getMinMaxNumber({min: 1, max: 1000, required: false}),
