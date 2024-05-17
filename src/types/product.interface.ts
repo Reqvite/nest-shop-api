@@ -88,11 +88,6 @@ export class GetWishlistResponseI {
   results: Product[];
 
   @ApiProperty({
-    example: 200
-  })
-  totalResults: number;
-
-  @ApiProperty({
     example: 1
   })
   currentPage: number;
@@ -101,11 +96,6 @@ export class GetWishlistResponseI {
     example: 10
   })
   totalPages: number;
-
-  @ApiProperty({
-    example: [1, 500]
-  })
-  minMaxPrices: number[];
 }
 
 export class GetProductsQuantityByCategoryResponseI {

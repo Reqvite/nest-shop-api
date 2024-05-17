@@ -13,17 +13,22 @@ export class Option {
   value: string;
 }
 
+export class Img {
+  @Prop({required: true})
+  src: string;
+}
+
 @Schema({timestamps: true, versionKey: false})
 export class Product {
   _id: MongooseSchema.Types.ObjectId;
 
-  @Prop({required: true})
-  image: string[];
+  @Prop({type: [{src: String}], required: true, _id: true})
+  images: {_id: MongooseSchema.Types.ObjectId | number; src: string}[];
 
   @Prop({required: true})
   title: string;
 
-  @Prop({type: () => [Option]})
+  @Prop({type: [{label: String, value: String}], required: true, _id: true})
   description: Option[];
 
   @Prop({default: 0})
@@ -44,10 +49,10 @@ export class Product {
   @Prop({required: true})
   subCategory: number;
 
-  @Prop({type: () => [Number], enum: TagsEnum, required: true})
+  @Prop({type: [{type: Number, enum: TagsEnum}], required: true})
   tags: number[];
 
-  @Prop({type: () => [Option], required: true})
+  @Prop({type: [{label: String, value: String}], required: true, _id: true})
   characteristics: Option[];
 
   @Prop({default: 0})

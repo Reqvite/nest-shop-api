@@ -27,55 +27,43 @@ export class ProductService {
   ) {}
 
   async getProductById(id: string): Promise<Product> {
-    const product = await this.productModel.findById(id);
+    const product = await this.productModel.findById(id).lean();
     if (!product) {
       throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Product'));
     }
+
     return product;
   }
 
   async getUserWishlist(params: ProductsQueryParamsSchemaType, userId: ObjectId): Promise<GetWishlistResponseI> {
     const {query, skip, pageIdx, itemsLimit} = getQueryParams(params);
     const user = await this.userModel.findOne({_id: userId}).select('wishlist');
-    const sort = getProductsSortBy(params.orderBy, Number(params.order) as SortOrder);
 
     const aggregationPipeline = [
+      {$match: {_id: {$in: user.wishlist}, ...query}},
       discountedPriceAddField,
-      sort,
       {
-        $match: {
-          _id: {$in: user.wishlist},
-          ...query
-        }
-      },
-      {$skip: skip},
-      {$limit: itemsLimit}
-    ];
-    const productsPromise = this.productModel.aggregate(aggregationPipeline);
-    const totalResultsPromise = this.productModel.aggregate([
-      discountedPriceAddField,
-      {$match: {...query, _id: {$in: user.wishlist}}},
-      {
-        $group: {
-          _id: null,
-          count: {$sum: 1}
+        $facet: {
+          products: [{$skip: skip}, {$limit: itemsLimit}],
+          totalCount: [
+            {
+              $group: {
+                _id: null,
+                count: {$sum: 1}
+              }
+            }
+          ]
         }
       }
-    ]);
-    const minMaxPricesPromise = this.productModel.aggregate([discountedPriceAddField, minMaxPricesGroup]);
-    const [products, totalResults, minMaxPrices] = await Promise.all([
-      productsPromise,
-      totalResultsPromise,
-      minMaxPricesPromise
-    ]);
-    const totalPages = Math.ceil(totalResults[0]?.count / itemsLimit);
+    ];
+
+    const [{products, totalCount}] = await this.productModel.aggregate(aggregationPipeline);
+    const totalPages = Math.ceil(totalCount[0]?.count / itemsLimit);
 
     return {
       results: products,
-      totalResults: totalResults[0]?.count,
       currentPage: pageIdx,
-      totalPages,
-      minMaxPrices: [minMaxPrices[0]?.minPrice, minMaxPrices[0]?.maxPrice]
+      totalPages
     };
   }
 
