@@ -23,6 +23,7 @@ import {productSchema} from './validation/product.schema';
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
+
   @Get('/wishlist')
   @UseGuards(AccessAuthGuard)
   @ProductSwagger.getUserWishlist()
