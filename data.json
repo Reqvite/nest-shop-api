@@ -164,9 +164,17 @@
       {
         "src": "https://masterzoo.ua/content/images/38/1800x1800l80mc0/suxoy-korm-dlja-shenkov-krupnyx-porod-savory-12-kg-indeyka-i-kurica-15294799373958.webp",
         "_id": 3
+      },
+      {
+        "src": "https://savory.pet/_next/image/?url=https%3A%2F%2Fsavory-backend.space%2Fwp-content%2Fuploads%2F2021%2F03%2Fsob_junior_turkey_and_chicken-art-30211-30204.jpg&w=3840&q=75",
+        "_id": 4
+      },
+      {
+        "src": "https://brain.com.ua/static/images/prod_img/4/7/U0652247_4big.jpg",
+        "_id": 5
       }
     ],
-    "title": "Dry food for puppies and young dogs Brit Premium By Nature Turkey with Liver 400 g (turkey)",
+    "title": "Dry food for puppies of large breeds Savory Junior Large Fresh Turkey & Chicken with fresh meat of turkey and chicken, 12 kg",
     "description": [
       {
         "label": "About product",
@@ -261,7 +269,7 @@
         "_id": 2
       }
     ],
-    "rating": 4,
+    "rating": 0,
     "price": 3,
     "quantity": 100,
     "brand": 2,
