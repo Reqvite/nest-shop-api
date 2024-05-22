@@ -4,6 +4,7 @@ import {Model, ObjectId} from 'mongoose';
 import {ErrorMessages} from '@/const/errors.const';
 import {CategoriesEnum} from '@/enums/categories.enum';
 import {SortOrder} from '@/enums/sortBy.enum';
+import {getEnumNumberValues} from '@/lib/helpers/getEnumNumberValues.heleper';
 import {CustomErrors} from '@/services/customErrors.service';
 import {
   GetProductsQuantityByCategoryResponseI,
@@ -110,7 +111,7 @@ export class ProductService {
 
     const aggregationPipeline = [
       discountedPriceAddField,
-      {$match: {...query, category: {$in: Object.values(CategoriesEnum)}}},
+      {$match: {...query, category: {$in: getEnumNumberValues(CategoriesEnum)}}},
       {
         $group: {
           _id: '$category',
