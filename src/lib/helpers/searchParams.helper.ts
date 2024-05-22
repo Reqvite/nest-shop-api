@@ -14,9 +14,9 @@ export const decodeSearchParams = (searchParams: Record<string, any>): ProductFi
       if (!decodedParams[baseKey]) {
         decodedParams[baseKey] = [];
       }
-      decodedParams[baseKey][parseInt(index)] = Number(val);
+      decodedParams[baseKey][parseInt(index)] = isNaN(Number(val)) ? val : Number(val);
     } else {
-      decodedParams[key] = Number(val);
+      decodedParams[key] = isNaN(Number(val)) ? val : Number(val);
     }
   });
 
