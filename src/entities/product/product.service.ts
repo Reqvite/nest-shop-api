@@ -2,6 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {InjectModel} from '@nestjs/mongoose';
 import {Model, ObjectId} from 'mongoose';
 import {ErrorMessages} from '@/const/errors.const';
+import {CategoriesEnum} from '@/enums/categories.enum';
 import {SortOrder} from '@/enums/sortBy.enum';
 import {CustomErrors} from '@/services/customErrors.service';
 import {
@@ -109,7 +110,7 @@ export class ProductService {
 
     const aggregationPipeline = [
       discountedPriceAddField,
-      {$match: {...query, category: {$in: [1, 2, 3]}}},
+      {$match: {...query, category: {$in: Object.values(CategoriesEnum)}}},
       {
         $group: {
           _id: '$category',
