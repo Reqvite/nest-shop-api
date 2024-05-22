@@ -67,4 +67,18 @@ export class CartService {
 
     return result.cart;
   }
+
+  async deleteItemFromCart(productId: ObjectId, userId: ObjectId): Promise<CartItem[]> {
+    const user = await this.userModel.findOneAndUpdate(
+      {
+        _id: userId
+      },
+      {$pull: {cart: {_id: productId}}},
+      {
+        new: true
+      }
+    );
+
+    return user.cart;
+  }
 }
