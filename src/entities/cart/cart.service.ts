@@ -34,8 +34,32 @@ export class CartService {
     );
 
     if (!result) {
-      throw CustomErrors.ConflictError();
+      throw CustomErrors.ConflictError('Product already in cart');
     }
+
+    return result.cart;
+  }
+
+  async updateCart(dto: AddToCartDto, userId: ObjectId): Promise<CartItem[]> {
+    const product = await this.productModel.findById({_id: dto._id});
+    if (!product) {
+      throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Product'));
+    }
+
+    const result = await this.userModel.findOneAndUpdate(
+      {
+        _id: userId,
+        cart: {$elemMatch: {_id: dto._id}}
+      },
+      {
+        $set: {
+          'cart.$.quantity': dto.quantity
+        }
+      },
+      {
+        new: true
+      }
+    );
 
     return result.cart;
   }
