@@ -34,7 +34,7 @@ export class CartService {
     );
 
     if (!result) {
-      throw CustomErrors.ConflictError();
+      throw CustomErrors.ConflictError('Product already in cart');
     }
 
     return result.cart;
