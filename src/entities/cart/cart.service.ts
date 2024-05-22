@@ -61,6 +61,10 @@ export class CartService {
       }
     );
 
+    if (!result) {
+      throw CustomErrors.NotFoundError('This product wasn`t found in your cart.');
+    }
+
     return result.cart;
   }
 }
