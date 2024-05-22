@@ -1,5 +1,6 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {ObjectId} from 'mongoose';
+import {CartItem} from '@/types/user.interface';
 
 export class AddToCartDto {
   @ApiProperty({
@@ -19,5 +20,5 @@ export class AddToCartResponseDto {
   @ApiProperty({
     example: [{_id: '663cda9190ba9b627e6f729d', quantity: 1}]
   })
-  cart: {_id: ObjectId; quantity: number}[];
+  cart: CartItem[];
 }

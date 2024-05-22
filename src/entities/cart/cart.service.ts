@@ -3,9 +3,10 @@ import {InjectModel} from '@nestjs/mongoose';
 import {Model, ObjectId} from 'mongoose';
 import {ErrorMessages} from '@/const/errors.const';
 import {CustomErrors} from '@/services/customErrors.service';
+import {CartItem} from '@/types/user.interface';
 import {User} from '../auth/model/user.model';
 import {Product} from '../product/model/product.model';
-import {AddToCartDto, AddToCartResponseDto} from './dto/addToCart.dto';
+import {AddToCartDto} from './dto/addToCart.dto';
 
 @Injectable()
 export class CartService {
@@ -14,12 +15,11 @@ export class CartService {
     @InjectModel(User.name) private readonly userModel: Model<User>
   ) {}
 
-  async addToCart(dto: AddToCartDto, userId: ObjectId): Promise<AddToCartResponseDto> {
+  async addToCart(dto: AddToCartDto, userId: ObjectId): Promise<CartItem[]> {
     const product = await this.productModel.findById({_id: dto._id});
     if (!product) {
       throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Product'));
     }
-    let cart = null;
     const result = await this.userModel.findOneAndUpdate(
       {
         _id: userId,
@@ -37,7 +37,6 @@ export class CartService {
       throw CustomErrors.ConflictError();
     }
 
-    cart = result.cart;
-    return cart;
+    return result.cart;
   }
 }

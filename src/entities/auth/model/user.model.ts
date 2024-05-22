@@ -20,13 +20,13 @@ export class User {
   @Prop({
     type: [
       {
-        productId: {type: MongooseSchema.Types.ObjectId, ref: 'Product'},
+        _id: {type: MongooseSchema.Types.ObjectId, ref: 'Product'},
         quantity: {type: Number, required: true, min: 1}
       }
     ],
     default: []
   })
-  cart: {productId: MongooseSchema.Types.ObjectId; quantity: number}[];
+  cart: {_id: MongooseSchema.Types.ObjectId; quantity: number}[];
 
   @Prop({unique: true, required: true})
   email: string;

@@ -1,4 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
+import {ObjectId} from 'mongoose';
 import {UserResponseDto} from '@/entities/auth/dto/userResponse.dto';
 import {TokensI} from './jwt.interface';
 
@@ -25,3 +26,5 @@ export class UserLoginResponseI {
   })
   tokens: TokensI;
 }
+
+export type CartItem = {_id: ObjectId; quantity: number};
