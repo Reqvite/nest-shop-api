@@ -3,7 +3,6 @@ import {InjectModel} from '@nestjs/mongoose';
 import {Model, ObjectId} from 'mongoose';
 import {ErrorMessages} from '@/const/errors.const';
 import {SortOrder} from '@/enums/sortBy.enum';
-import {decodeSearchParams} from '@/lib/helpers/searchParams.helper';
 import {CustomErrors} from '@/services/customErrors.service';
 import {
   GetProductsQuantityByCategoryResponseI,
@@ -106,25 +105,20 @@ export class ProductService {
   async getProductsQuantityByCategories(
     params: ProductsQueryParamsSchemaType
   ): Promise<GetProductsQuantityByCategoryResponseI[]> {
-    const {categories} = decodeSearchParams(params);
-    const aggregationPipeline = [];
+    const {query} = getQueryParams(params);
 
-    if (categories) {
-      aggregationPipeline.push({
-        $match: {
-          category: {$in: categories}
+    const aggregationPipeline = [
+      discountedPriceAddField,
+      {$match: {...query, category: {$in: [1, 2, 3]}}},
+      {
+        $group: {
+          _id: '$category',
+          quantity: {$sum: 1}
         }
-      });
-    }
-    aggregationPipeline.push({
-      $group: {
-        _id: '$category',
-        quantity: {$sum: 1}
       }
-    });
+    ];
 
     const productQuantities = await this.productModel.aggregate(aggregationPipeline);
-
     return productQuantities;
   }
 
