@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Param, Post, Put, UseGuards} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Post, Put, UseGuards} from '@nestjs/common';
 import {ApiTags} from '@nestjs/swagger';
 import {ObjectId} from 'mongoose';
 import {GetCurrentUser} from '@/commons/decorators/getCurrentUser.decorator';
@@ -6,6 +6,7 @@ import {AccessAuthGuard} from '@/commons/guards/jwt.guard';
 import {ObjectIdValidationPipe} from '@/commons/pipes/objectIdValidation.pipe';
 import {YupValidationPipe} from '@/commons/pipes/yupValidation.pipe';
 import {JwtPayloadI} from '@/types/jwt.interface';
+import {ProductWithOrderedQuantity} from '@/types/product.interface';
 import {CartItem} from '@/types/user.interface';
 import {CartService} from './cart.service';
 import {AddToCartDto} from './dto/addToCart.dto';
@@ -16,6 +17,13 @@ import {addToCartSchema} from './validation/addToCart.schema';
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
+
+  @Get()
+  @UseGuards(AccessAuthGuard)
+  @CartSwagger.getCart()
+  async getCart(@GetCurrentUser() {_id}: {_id: string}): Promise<ProductWithOrderedQuantity[]> {
+    return this.cartService.getCart(_id);
+  }
 
   @Post()
   @UseGuards(AccessAuthGuard)

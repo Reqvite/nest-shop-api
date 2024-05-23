@@ -109,6 +109,10 @@ export class GetProductsQuantityByCategoryResponseI {
   quantity: number;
 }
 
+export type ProductWithOrderedQuantity = Product & {
+  orderedQuantity: number;
+};
+
 interface ProductParamsI {
   brand?: {$in: number[]};
   discountedPrice?: {$gte: number; $lt: number};

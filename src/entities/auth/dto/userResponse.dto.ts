@@ -1,5 +1,6 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {ObjectId} from 'mongoose';
+import {CartItem} from '@/types/user.interface';
 import {User} from '../model/user.model';
 
 export class UserResponseDto {
@@ -32,12 +33,18 @@ export class UserResponseDto {
   })
   wishlist: ObjectId[];
 
+  @ApiProperty({
+    example: []
+  })
+  cart: CartItem[];
+
   constructor(model: User) {
     this._id = model._id;
     this.email = model.email;
     this.firstName = model.firstName;
     this.lastName = model.lastName;
     this.wishlist = model.wishlist;
+    this.cart = model.cart;
   }
 }
 

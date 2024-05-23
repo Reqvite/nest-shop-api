@@ -1,8 +1,10 @@
 import {Injectable} from '@nestjs/common';
 import {InjectModel} from '@nestjs/mongoose';
-import {Model, ObjectId} from 'mongoose';
+import {ObjectId} from 'mongodb';
+import {Model, ObjectId as ObjectIdType} from 'mongoose';
 import {ErrorMessages} from '@/const/errors.const';
 import {CustomErrors} from '@/services/customErrors.service';
+import {ProductWithOrderedQuantity} from '@/types/product.interface';
 import {CartItem} from '@/types/user.interface';
 import {User} from '../auth/model/user.model';
 import {Product} from '../product/model/product.model';
@@ -15,7 +17,35 @@ export class CartService {
     @InjectModel(User.name) private readonly userModel: Model<User>
   ) {}
 
-  async addToCart(dto: AddToCartDto, userId: ObjectId): Promise<CartItem[]> {
+  async getCart(_id: string): Promise<ProductWithOrderedQuantity[]> {
+    const cart = await this.userModel.aggregate([
+      {$match: {_id: new ObjectId(_id)}},
+      {$unwind: '$cart'},
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'cart._id',
+          foreignField: '_id',
+          as: 'productDetails'
+        }
+      },
+      {$unwind: '$productDetails'},
+      {
+        $addFields: {
+          'productDetails.orderedQuantity': '$cart.quantity'
+        }
+      },
+      {
+        $replaceRoot: {
+          newRoot: '$productDetails'
+        }
+      }
+    ]);
+
+    return cart;
+  }
+
+  async addToCart(dto: AddToCartDto, userId: ObjectIdType): Promise<CartItem[]> {
     const product = await this.productModel.findById({_id: dto._id});
     if (!product) {
       throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Product'));
@@ -40,7 +70,7 @@ export class CartService {
     return result.cart;
   }
 
-  async updateCart(dto: AddToCartDto, userId: ObjectId): Promise<CartItem[]> {
+  async updateCart(dto: AddToCartDto, userId: ObjectIdType): Promise<CartItem[]> {
     const product = await this.productModel.findById({_id: dto._id});
     if (!product) {
       throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Product'));
@@ -68,7 +98,7 @@ export class CartService {
     return result.cart;
   }
 
-  async deleteItemFromCart(productId: ObjectId, userId: ObjectId): Promise<CartItem[]> {
+  async deleteItemFromCart(productId: ObjectIdType, userId: ObjectIdType): Promise<CartItem[]> {
     const user = await this.userModel.findOneAndUpdate(
       {
         _id: userId
