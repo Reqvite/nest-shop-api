@@ -18,6 +18,12 @@ export const CartSwagger = {
       ApiBody({type: AddToCartDto}),
       ApiOperation({summary: 'Add product to cart'})
     ),
+  completeOrder: () =>
+    applyDecorators(
+      ApiBearerAuth(),
+      ApiResponse({status: HttpStatus.CREATED, description: SuccessMessages.SUCCESS}),
+      ApiOperation({summary: 'Complete order'})
+    ),
   updateCart: () =>
     applyDecorators(
       ApiBearerAuth(),
