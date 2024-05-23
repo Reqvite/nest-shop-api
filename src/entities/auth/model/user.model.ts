@@ -17,6 +17,17 @@ export class User {
   @Prop({type: [{type: MongooseSchema.Types.ObjectId, ref: 'Product'}], default: []})
   wishlist: ObjectId[];
 
+  @Prop({
+    type: [
+      {
+        _id: {type: MongooseSchema.Types.ObjectId, ref: 'Product'},
+        quantity: {type: Number, required: true, min: 1}
+      }
+    ],
+    default: []
+  })
+  cart: {_id: MongooseSchema.Types.ObjectId; quantity: number}[];
+
   @Prop({unique: true, required: true})
   email: string;
 
