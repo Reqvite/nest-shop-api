@@ -12,7 +12,7 @@ import {CartService} from './cart.service';
 import {AddToCartDto} from './dto/addToCart.dto';
 import {CartSwagger} from './swagger/cart.swagger';
 import {addToCartSchema} from './validation/addToCart.schema';
-import {completedOrderSchema} from './validation/completedOrtder.scema';
+import {completeOrderSchema} from './validation/completeOrder.schema';
 
 @ApiTags('Cart')
 @Controller('cart')
@@ -40,7 +40,7 @@ export class CartController {
   @UseGuards(AccessAuthGuard)
   @CartSwagger.completeOrder()
   async completeOrder(
-    @Body(new YupValidationPipe(completedOrderSchema)) dto: {products: CartItem[]},
+    @Body(new YupValidationPipe(completeOrderSchema)) dto: {products: CartItem[]},
     @GetCurrentUser() {_id: userId}: JwtPayloadI
   ): Promise<void> {
     return this.cartService.completeOrder(dto.products, userId);
