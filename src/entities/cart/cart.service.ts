@@ -39,4 +39,32 @@ export class CartService {
 
     return result.cart;
   }
+
+  async updateCart(dto: AddToCartDto, userId: ObjectId): Promise<CartItem[]> {
+    const product = await this.productModel.findById({_id: dto._id});
+    if (!product) {
+      throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Product'));
+    }
+
+    const result = await this.userModel.findOneAndUpdate(
+      {
+        _id: userId,
+        cart: {$elemMatch: {_id: dto._id}}
+      },
+      {
+        $set: {
+          'cart.$.quantity': dto.quantity
+        }
+      },
+      {
+        new: true
+      }
+    );
+
+    if (!result) {
+      throw CustomErrors.NotFoundError('This product wasn`t found in your cart.');
+    }
+
+    return result.cart;
+  }
 }

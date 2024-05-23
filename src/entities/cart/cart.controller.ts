@@ -1,4 +1,4 @@
-import {Body, Controller, Post, UseGuards} from '@nestjs/common';
+import {Body, Controller, Post, Put, UseGuards} from '@nestjs/common';
 import {ApiTags} from '@nestjs/swagger';
 import {GetCurrentUser} from '@/commons/decorators/getCurrentUser.decorator';
 import {AccessAuthGuard} from '@/commons/guards/jwt.guard';
@@ -23,5 +23,15 @@ export class CartController {
     @GetCurrentUser() {_id: userId}: JwtPayloadI
   ): Promise<CartItem[]> {
     return this.cartService.addToCart(dto, userId);
+  }
+
+  @Put()
+  @UseGuards(AccessAuthGuard)
+  @CartSwagger.addToCart()
+  async updateCart(
+    @Body(new YupValidationPipe(addToCartSchema)) dto: AddToCartDto,
+    @GetCurrentUser() {_id: userId}: JwtPayloadI
+  ): Promise<CartItem[]> {
+    return this.cartService.updateCart(dto, userId);
   }
 }
