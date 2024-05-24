@@ -12,6 +12,7 @@ import {CartService} from './cart.service';
 import {AddToCartDto} from './dto/addToCart.dto';
 import {CartSwagger} from './swagger/cart.swagger';
 import {addToCartSchema} from './validation/addToCart.schema';
+import {completeOrderSchema} from './validation/completeOrder.schema';
 
 @ApiTags('Cart')
 @Controller('cart')
@@ -33,6 +34,16 @@ export class CartController {
     @GetCurrentUser() {_id: userId}: JwtPayloadI
   ): Promise<CartItem[]> {
     return this.cartService.addToCart(dto, userId);
+  }
+
+  @Post('/complete')
+  @UseGuards(AccessAuthGuard)
+  @CartSwagger.completeOrder()
+  async completeOrder(
+    @Body(new YupValidationPipe(completeOrderSchema)) dto: {products: CartItem[]},
+    @GetCurrentUser() {_id: userId}: JwtPayloadI
+  ): Promise<void> {
+    return this.cartService.completeOrder(dto.products, userId);
   }
 
   @Put()

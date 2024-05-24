@@ -1,4 +1,5 @@
 export const ErrorMessages = {
+  INSUFFICIENT_QUANTITY: 'Insufficient quantity available for one or more products.',
   UNAUTHORIZED: 'Access is denied.',
   BAD_REQUEST: 'The request is invalid or malformed.',
   CONFLICT: 'The resource already exists or a conflict occurred.',

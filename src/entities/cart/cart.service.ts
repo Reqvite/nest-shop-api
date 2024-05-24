@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
-import {InjectModel} from '@nestjs/mongoose';
+import {InjectConnection, InjectModel} from '@nestjs/mongoose';
 import {ObjectId} from 'mongodb';
-import {Model, ObjectId as ObjectIdType} from 'mongoose';
+import mongoose, {Model, ObjectId as ObjectIdType} from 'mongoose';
 import {ErrorMessages} from '@/const/errors.const';
 import {CustomErrors} from '@/services/customErrors.service';
 import {ProductWithOrderedQuantity} from '@/types/product.interface';
@@ -9,12 +9,15 @@ import {CartItem} from '@/types/user.interface';
 import {User} from '../auth/model/user.model';
 import {Product} from '../product/model/product.model';
 import {AddToCartDto} from './dto/addToCart.dto';
+import {Order} from './model/order.model';
 
 @Injectable()
 export class CartService {
   constructor(
+    @InjectConnection() private readonly connection: mongoose.Connection,
     @InjectModel(Product.name) private readonly productModel: Model<Product>,
-    @InjectModel(User.name) private readonly userModel: Model<User>
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(Order.name) private readonly orderModel: Model<User>
   ) {}
 
   async getCart(_id: string): Promise<ProductWithOrderedQuantity[]> {
@@ -43,6 +46,53 @@ export class CartService {
     ]);
 
     return cart;
+  }
+
+  async completeOrder(products: CartItem[], userId: ObjectIdType): Promise<void> {
+    const session = await this.connection.startSession();
+    session.startTransaction();
+
+    try {
+      const productsIds = products.map(({_id}) => _id);
+      const foundedProducts = await this.productModel.find({_id: {$in: productsIds}}).session(session);
+
+      for (const foundedProduct of foundedProducts) {
+        const orderedProduct = products.find(({_id}) => String(_id) === String(foundedProduct._id));
+        if (foundedProduct.quantity < orderedProduct.quantity) {
+          throw CustomErrors.BadRequestError(ErrorMessages.INSUFFICIENT_QUANTITY);
+        }
+      }
+
+      const updatedProducts = products.map(({_id, quantity}) => ({
+        updateOne: {
+          filter: {
+            _id
+          },
+          update: [
+            {
+              $set: {
+                quantity: {
+                  $max: [0, {$subtract: ['$quantity', quantity]}]
+                }
+              }
+            }
+          ]
+        }
+      }));
+
+      await Promise.all([
+        this.productModel.bulkWrite(updatedProducts, {session}),
+        this.userModel.findByIdAndUpdate({_id: userId}, {cart: []}, {session}),
+        this.orderModel.create([{products, userId}], {session})
+      ]);
+
+      await session.commitTransaction();
+      session.endSession();
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
   }
 
   async addToCart(dto: AddToCartDto, userId: ObjectIdType): Promise<CartItem[]> {

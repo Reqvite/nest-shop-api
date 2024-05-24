@@ -4,12 +4,14 @@ import {User, UserSchema} from '../auth/model/user.model';
 import {Product, ProductSchema} from '../product/model/product.model';
 import {CartController} from './cart.controller';
 import {CartService} from './cart.service';
+import {Order, OrderSchema} from './model/order.model';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       {name: Product.name, schema: ProductSchema},
-      {name: User.name, schema: UserSchema}
+      {name: User.name, schema: UserSchema},
+      {name: Order.name, schema: OrderSchema}
     ])
   ],
   providers: [CartService],
