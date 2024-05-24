@@ -63,7 +63,7 @@ export class CartService {
         }
       }
 
-      const bulkArr = products.map(({_id, quantity}) => ({
+      const updatedProducts = products.map(({_id, quantity}) => ({
         updateOne: {
           filter: {
             _id
@@ -81,7 +81,7 @@ export class CartService {
       }));
 
       await Promise.all([
-        this.productModel.bulkWrite(bulkArr, {session}),
+        this.productModel.bulkWrite(updatedProducts, {session}),
         this.userModel.findByIdAndUpdate({_id: userId}, {cart: []}, {session}),
         this.orderModel.create([{products, userId}], {session})
       ]);
