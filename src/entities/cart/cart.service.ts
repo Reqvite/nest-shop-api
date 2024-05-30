@@ -9,7 +9,9 @@ import {CartItem} from '@/types/user.interface';
 import {User} from '../auth/model/user.model';
 import {Product} from '../product/model/product.model';
 import {AddToCartDto} from './dto/addToCart.dto';
+import {CompleteOrderDto} from './dto/completeOrder.dto';
 import {checkProductQuantity, checkProductsQuantity} from './helpers/checkQuantity';
+import {getBillingInfo} from './helpers/getBillingInfo';
 import {Order} from './model/order.model';
 
 @Injectable()
@@ -49,7 +51,7 @@ export class CartService {
     return cart;
   }
 
-  async completeOrder(products: CartItem[], userId: ObjectIdType): Promise<void> {
+  async completeOrder({products, orderInformation}: CompleteOrderDto, userId: ObjectIdType): Promise<void> {
     const session = await this.connection.startSession();
     session.startTransaction();
 
@@ -79,7 +81,7 @@ export class CartService {
       await Promise.all([
         this.productModel.bulkWrite(updatedProducts, {session}),
         this.userModel.findByIdAndUpdate({_id: userId}, {cart: []}, {session}),
-        this.orderModel.create([{products, userId}], {session})
+        this.orderModel.create([{products, userId, billingInfo: getBillingInfo(orderInformation)}], {session})
       ]);
 
       await session.commitTransaction();

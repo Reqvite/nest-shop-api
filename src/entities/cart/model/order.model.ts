@@ -1,5 +1,6 @@
 import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
 import {HydratedDocument, Schema as MongooseSchema} from 'mongoose';
+import {Option} from '@/entities/product/model/product.model';
 
 export type OrderDocument = HydratedDocument<Order>;
 
@@ -20,6 +21,9 @@ export class Order {
     default: []
   })
   products: {_id: MongooseSchema.Types.ObjectId; quantity: number}[];
+
+  @Prop({type: [{label: String, value: String}], required: true, _id: true})
+  billingInfo: Option[];
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);

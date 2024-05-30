@@ -13,7 +13,7 @@ import {
 } from '@/types/product.interface';
 import {UserWishlistResponseDto} from '../auth/dto/userResponse.dto';
 import {User} from '../auth/model/user.model';
-import {discountedPriceAddField, minMaxPricesGroup} from './const/pipelines.const';
+import {addFields, minMaxPricesGroup} from './const/pipelines.const';
 import {CreateProductDto} from './dto/createProduct.dto';
 import {getQueryParams} from './helpers/getQueryParams';
 import {getProductsSortBy} from './helpers/getSortBy';
@@ -42,7 +42,7 @@ export class ProductService {
 
     const aggregationPipeline = [
       {$match: {_id: {$in: user.wishlist}, ...query}},
-      discountedPriceAddField,
+      addFields,
       {
         $facet: {
           products: [{$skip: skip}, {$limit: itemsLimit}],
@@ -72,27 +72,36 @@ export class ProductService {
     const {query, skip, pageIdx, itemsLimit} = getQueryParams(params);
     const sort = getProductsSortBy(params.orderBy, Number(params.order) as SortOrder);
 
-    const aggregationPipeline = [discountedPriceAddField, sort, {$match: query}, {$skip: skip}, {$limit: itemsLimit}];
-    const productsPromise = this.productModel.aggregate(aggregationPipeline);
-    const totalResultsPromise = this.productModel.aggregate([
-      discountedPriceAddField,
-      {$match: query},
+    const aggregationPipeline = [
+      addFields,
       {
-        $group: {
-          _id: null,
-          count: {$sum: 1}
+        $facet: {
+          products: [sort, {$match: query}, {$skip: skip}, {$limit: itemsLimit}],
+          totalResults: [
+            {$match: query},
+            {
+              $group: {
+                _id: null,
+                count: {$sum: 1}
+              }
+            }
+          ],
+          totalProducts: [
+            {
+              $count: 'total'
+            }
+          ],
+          minMaxPrices: [minMaxPricesGroup]
         }
       }
-    ]);
-    const totalProductsPromise = this.productModel.countDocuments();
-    const minMaxPricesPromise = this.productModel.aggregate([discountedPriceAddField, minMaxPricesGroup]);
-    const [products, totalResults, totalProducts, minMaxPrices] = await Promise.all([
-      productsPromise,
-      totalResultsPromise,
-      totalProductsPromise,
-      minMaxPricesPromise
-    ]);
-    const totalPages = Math.ceil(totalResults[0]?.count / itemsLimit);
+    ];
+
+    const results = await this.productModel.aggregate(aggregationPipeline);
+    const products = results[0]?.products;
+    const totalResults = results[0]?.totalResults?.length ? results[0]?.totalResults[0]?.count : 0;
+    const totalProducts = results[0]?.totalProducts?.length ? results[0]?.totalProducts[0]?.total : 0;
+    const minMaxPrices = results[0]?.minMaxPrices;
+    const totalPages = Math.ceil(totalResults / itemsLimit);
 
     return {
       results: products,
@@ -110,7 +119,7 @@ export class ProductService {
     const {query} = getQueryParams(params);
 
     const aggregationPipeline = [
-      discountedPriceAddField,
+      addFields,
       {$match: {...query, category: {$in: getEnumNumberValues(CategoriesEnum)}}},
       {
         $group: {

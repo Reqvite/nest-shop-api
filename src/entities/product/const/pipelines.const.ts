@@ -1,6 +1,13 @@
-export const discountedPriceAddField = {
+export const addFields = {
   $addFields: {
-    discountedPrice: {$subtract: ['$price', {$multiply: ['$price', {$divide: ['$discount', 100]}]}]}
+    discountedPrice: {$subtract: ['$price', {$multiply: ['$price', {$divide: ['$discount', 100]}]}]},
+    sortQuantity: {
+      $cond: {
+        if: {$eq: ['$quantity', 0]},
+        then: 1,
+        else: 0
+      }
+    }
   }
 };
 
