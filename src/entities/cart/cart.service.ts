@@ -9,6 +9,7 @@ import {CartItem} from '@/types/user.interface';
 import {User} from '../auth/model/user.model';
 import {Product} from '../product/model/product.model';
 import {AddToCartDto} from './dto/addToCart.dto';
+import {checkProductQuantity, checkProductsQuantity} from './helpers/checkQuantity';
 import {Order} from './model/order.model';
 
 @Injectable()
@@ -56,12 +57,7 @@ export class CartService {
       const productsIds = products.map(({_id}) => _id);
       const foundedProducts = await this.productModel.find({_id: {$in: productsIds}}).session(session);
 
-      for (const foundedProduct of foundedProducts) {
-        const orderedProduct = products.find(({_id}) => String(_id) === String(foundedProduct._id));
-        if (foundedProduct.quantity < orderedProduct.quantity) {
-          throw CustomErrors.BadRequestError(ErrorMessages.INSUFFICIENT_QUANTITY);
-        }
-      }
+      checkProductsQuantity(products, foundedProducts);
 
       const updatedProducts = products.map(({_id, quantity}) => ({
         updateOne: {
@@ -100,6 +96,9 @@ export class CartService {
     if (!product) {
       throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Product'));
     }
+
+    checkProductQuantity(product, dto);
+
     const result = await this.userModel.findOneAndUpdate(
       {
         _id: userId,
@@ -125,6 +124,8 @@ export class CartService {
     if (!product) {
       throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Product'));
     }
+
+    checkProductQuantity(product, dto);
 
     const result = await this.userModel.findOneAndUpdate(
       {

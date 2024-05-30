@@ -29,6 +29,11 @@ export class UserResponseDto {
   email: string;
 
   @ApiProperty({
+    example: 380604523122
+  })
+  phoneNumber: string;
+
+  @ApiProperty({
     example: []
   })
   wishlist: ObjectId[];
@@ -43,6 +48,7 @@ export class UserResponseDto {
     this.email = model.email;
     this.firstName = model.firstName;
     this.lastName = model.lastName;
+    this.phoneNumber = model.phoneNumber;
     this.wishlist = model.wishlist;
     this.cart = model.cart;
   }
