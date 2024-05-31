@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, Post, Put, UseGuards} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards} from '@nestjs/common';
 import {ApiTags} from '@nestjs/swagger';
 import {ObjectId} from 'mongoose';
 import {GetCurrentUser} from '@/commons/decorators/getCurrentUser.decorator';
@@ -8,6 +8,7 @@ import {YupValidationPipe} from '@/commons/pipes/yupValidation.pipe';
 import {JwtPayloadI} from '@/types/jwt.interface';
 import {ProductWithOrderedQuantity} from '@/types/product.interface';
 import {CartItem} from '@/types/user.interface';
+import {getProductsQueryParamsSchema} from '../product/validation/getProductsQueryParams.schema';
 import {CartService} from './cart.service';
 import {AddToCartDto} from './dto/addToCart.dto';
 import {CompleteOrderDto} from './dto/completeOrder.dto';
@@ -25,6 +26,16 @@ export class CartController {
   @CartSwagger.getCart()
   async getCart(@GetCurrentUser() {_id}: {_id: string}): Promise<ProductWithOrderedQuantity[]> {
     return this.cartService.getCart(_id);
+  }
+
+  @Get('/orders')
+  @UseGuards(AccessAuthGuard)
+  @CartSwagger.getCart()
+  async getOrders(
+    @GetCurrentUser() {_id}: {_id: string},
+    @Query(new YupValidationPipe(getProductsQueryParamsSchema)) params: {[key: string]: string}
+  ): Promise<ProductWithOrderedQuantity[]> {
+    return this.cartService.getOrders(_id, params);
   }
 
   @Post()

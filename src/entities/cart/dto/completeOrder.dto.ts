@@ -33,4 +33,5 @@ export class CompleteOrderDto {
   })
   products: CartItem[];
   orderInformation: BillingInfo;
+  totalPrice: number;
 }

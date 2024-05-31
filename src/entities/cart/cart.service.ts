@@ -7,7 +7,9 @@ import {CustomErrors} from '@/services/customErrors.service';
 import {ProductWithOrderedQuantity} from '@/types/product.interface';
 import {CartItem} from '@/types/user.interface';
 import {User} from '../auth/model/user.model';
+import {getQueryParams} from '../product/helpers/getQueryParams';
 import {Product} from '../product/model/product.model';
+import {ProductsQueryParamsSchemaType} from '../product/validation/getProductsQueryParams.schema';
 import {AddToCartDto} from './dto/addToCart.dto';
 import {CompleteOrderDto} from './dto/completeOrder.dto';
 import {checkProductQuantity, checkProductsQuantity} from './helpers/checkQuantity';
@@ -22,6 +24,71 @@ export class CartService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Order.name) private readonly orderModel: Model<User>
   ) {}
+
+  async getOrders(_id: string, params: ProductsQueryParamsSchemaType): Promise<any> {
+    const {query, skip, pageIdx, itemsLimit} = getQueryParams(params);
+
+    const aggregationPipeline = [
+      {
+        $facet: {
+          orders: [
+            {$match: {userId: new ObjectId(_id), ...query}},
+            {$skip: skip},
+            {$limit: itemsLimit},
+            {
+              $lookup: {
+                from: 'products',
+                localField: 'products._id',
+                foreignField: '_id',
+                as: 'fullProducts'
+              }
+            },
+            {
+              $addFields: {
+                products: '$fullProducts',
+                quantity: '$fullProducts.quantity'
+              }
+            },
+            {
+              $project: {
+                fullProducts: 0
+              }
+            }
+          ],
+          totalResults: [
+            {$match: {userId: new ObjectId(_id), ...query}},
+            {
+              $group: {
+                _id: null,
+                count: {$sum: 1}
+              }
+            }
+          ],
+          totalOrders: [
+            {$match: {userId: new ObjectId(_id), ...query}},
+            {
+              $count: 'total'
+            }
+          ]
+        }
+      }
+    ];
+
+    const results = await this.orderModel.aggregate(aggregationPipeline);
+
+    const orders = results[0]?.orders;
+    const totalResults = results[0]?.totalResults?.length ? results[0]?.totalResults[0]?.count : 0;
+    const totalProducts = results[0]?.totalOrders?.length ? results[0]?.totalOrders[0]?.total : 0;
+    const totalPages = Math.ceil(totalResults / itemsLimit);
+
+    return {
+      results: orders,
+      totalResults: totalResults[0]?.count,
+      currentPage: pageIdx,
+      totalPages,
+      totalItems: totalProducts
+    };
+  }
 
   async getCart(_id: string): Promise<ProductWithOrderedQuantity[]> {
     const cart = await this.userModel.aggregate([
@@ -51,7 +118,7 @@ export class CartService {
     return cart;
   }
 
-  async completeOrder({products, orderInformation}: CompleteOrderDto, userId: ObjectIdType): Promise<void> {
+  async completeOrder({products, orderInformation, totalPrice}: CompleteOrderDto, userId: ObjectIdType): Promise<void> {
     const session = await this.connection.startSession();
     session.startTransaction();
 
@@ -78,10 +145,13 @@ export class CartService {
         }
       }));
 
+      console.log(totalPrice);
       await Promise.all([
         this.productModel.bulkWrite(updatedProducts, {session}),
         this.userModel.findByIdAndUpdate({_id: userId}, {cart: []}, {session}),
-        this.orderModel.create([{products, userId, billingInfo: getBillingInfo(orderInformation)}], {session})
+        this.orderModel.create([{products, userId, billingInfo: getBillingInfo(orderInformation), totalPrice}], {
+          session
+        })
       ]);
 
       await session.commitTransaction();

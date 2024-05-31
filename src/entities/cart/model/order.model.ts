@@ -24,6 +24,9 @@ export class Order {
 
   @Prop({type: [{label: String, value: String}], required: true, _id: true})
   billingInfo: Option[];
+
+  @Prop({required: true, type: Number})
+  totalPrice: number;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
