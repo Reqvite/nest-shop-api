@@ -1,11 +1,8 @@
 import {ApiProperty} from '@nestjs/swagger';
-import * as yup from 'yup';
-import {orderInformationSchema} from '@/entities/cart/validation/completeOrder.schema';
-import {ProductWithOrderedQuantity} from './product.interface';
+import {BillingInfo} from '@/types/cart.interface';
+import {CartItem} from '@/types/user.interface';
 
-export type BillingInfo = yup.InferType<typeof orderInformationSchema>;
-
-export class GetCartResponseI {
+export class CompleteOrderDto {
   @ApiProperty({
     example: {
       image: ['https://example.com/product-image1.jpg', 'https://example.com/product-image2.jpg'],
@@ -34,6 +31,6 @@ export class GetCartResponseI {
     },
     required: true
   })
-  products: ProductWithOrderedQuantity[];
+  products: CartItem[];
   orderInformation: BillingInfo;
 }
