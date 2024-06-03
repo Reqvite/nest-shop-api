@@ -31,8 +31,8 @@ export class CartService {
     const {query, skip, pageIdx, itemsLimit} = getQueryParams(params);
     const results = await this.orderModel.aggregate(getOrdersPipeline({skip, itemsLimit, _id, query}));
     const orders = results[0]?.orders;
-    const totalResults = results[0]?.totalResults?.length ? results[0]?.totalResults[0]?.count : 0;
-    const totalProducts = results[0]?.totalOrders?.length ? results[0]?.totalOrders[0]?.total : 0;
+    const totalResults = results[0]?.totalResults[0]?.count || 0;
+    const totalOrders = results[0]?.totalOrders[0]?.total || 0;
     const totalPages = Math.ceil(totalResults / itemsLimit);
 
     return {
@@ -40,7 +40,7 @@ export class CartService {
       totalResults: totalResults[0]?.count,
       currentPage: pageIdx,
       totalPages,
-      totalItems: totalProducts
+      totalItems: totalOrders
     };
   }
 
