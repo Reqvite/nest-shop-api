@@ -4,6 +4,7 @@ import {ObjectId} from 'mongodb';
 import mongoose, {Model, ObjectId as ObjectIdType} from 'mongoose';
 import {ErrorMessages} from '@/const/errors.const';
 import {CustomErrors} from '@/services/customErrors.service';
+import {GetOrdersResponseI} from '@/types/cart.interface';
 import {ProductWithOrderedQuantity} from '@/types/product.interface';
 import {CartItem} from '@/types/user.interface';
 import {User} from '../auth/model/user.model';
@@ -15,6 +16,7 @@ import {CompleteOrderDto} from './dto/completeOrder.dto';
 import {checkProductQuantity, checkProductsQuantity} from './helpers/checkQuantity';
 import {getBillingInfo} from './helpers/getBillingInfo';
 import {Order} from './model/order.model';
+import {getOrdersPipeline} from './pipelines/getOrders.pipeline';
 
 @Injectable()
 export class CartService {
@@ -25,57 +27,9 @@ export class CartService {
     @InjectModel(Order.name) private readonly orderModel: Model<User>
   ) {}
 
-  async getOrders(_id: string, params: ProductsQueryParamsSchemaType): Promise<any> {
+  async getOrders(_id: string, params: ProductsQueryParamsSchemaType): Promise<GetOrdersResponseI> {
     const {query, skip, pageIdx, itemsLimit} = getQueryParams(params);
-
-    const aggregationPipeline = [
-      {
-        $facet: {
-          orders: [
-            {$match: {userId: new ObjectId(_id), ...query}},
-            {$skip: skip},
-            {$limit: itemsLimit},
-            {
-              $lookup: {
-                from: 'products',
-                localField: 'products._id',
-                foreignField: '_id',
-                as: 'fullProducts'
-              }
-            },
-            {
-              $addFields: {
-                products: '$fullProducts',
-                quantity: '$fullProducts.quantity'
-              }
-            },
-            {
-              $project: {
-                fullProducts: 0
-              }
-            }
-          ],
-          totalResults: [
-            {$match: {userId: new ObjectId(_id), ...query}},
-            {
-              $group: {
-                _id: null,
-                count: {$sum: 1}
-              }
-            }
-          ],
-          totalOrders: [
-            {$match: {userId: new ObjectId(_id), ...query}},
-            {
-              $count: 'total'
-            }
-          ]
-        }
-      }
-    ];
-
-    const results = await this.orderModel.aggregate(aggregationPipeline);
-
+    const results = await this.orderModel.aggregate(getOrdersPipeline({skip, itemsLimit, _id, query}));
     const orders = results[0]?.orders;
     const totalResults = results[0]?.totalResults?.length ? results[0]?.totalResults[0]?.count : 0;
     const totalProducts = results[0]?.totalOrders?.length ? results[0]?.totalOrders[0]?.total : 0;
@@ -145,7 +99,6 @@ export class CartService {
         }
       }));
 
-      console.log(totalPrice);
       await Promise.all([
         this.productModel.bulkWrite(updatedProducts, {session}),
         this.userModel.findByIdAndUpdate({_id: userId}, {cart: []}, {session}),

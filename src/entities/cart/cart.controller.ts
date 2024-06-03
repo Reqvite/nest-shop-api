@@ -5,6 +5,7 @@ import {GetCurrentUser} from '@/commons/decorators/getCurrentUser.decorator';
 import {AccessAuthGuard} from '@/commons/guards/jwt.guard';
 import {ObjectIdValidationPipe} from '@/commons/pipes/objectIdValidation.pipe';
 import {YupValidationPipe} from '@/commons/pipes/yupValidation.pipe';
+import {GetOrdersResponseI} from '@/types/cart.interface';
 import {JwtPayloadI} from '@/types/jwt.interface';
 import {ProductWithOrderedQuantity} from '@/types/product.interface';
 import {CartItem} from '@/types/user.interface';
@@ -34,7 +35,7 @@ export class CartController {
   async getOrders(
     @GetCurrentUser() {_id}: {_id: string},
     @Query(new YupValidationPipe(getProductsQueryParamsSchema)) params: {[key: string]: string}
-  ): Promise<ProductWithOrderedQuantity[]> {
+  ): Promise<GetOrdersResponseI> {
     return this.cartService.getOrders(_id, params);
   }
 

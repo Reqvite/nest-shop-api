@@ -1,10 +1,16 @@
 import {applyDecorators, HttpStatus} from '@nestjs/common';
-import {ApiBearerAuth, ApiBody, ApiOperation, ApiResponse} from '@nestjs/swagger';
+import {ApiBearerAuth, ApiBody, ApiOperation, ApiQuery, ApiResponse} from '@nestjs/swagger';
 import {SuccessMessages} from '@/const/success.const';
-import {GetCartResponseI} from '@/types/cart.interface';
+import {GetCartResponseI, GetOrdersResponseI} from '@/types/cart.interface';
 import {AddToCartDto} from '../dto/addToCart.dto';
 
 export const CartSwagger = {
+  getOrders: () =>
+    applyDecorators(
+      ApiOperation({summary: 'Get orders'}),
+      ApiResponse({status: HttpStatus.OK, description: SuccessMessages.SUCCESS, type: GetOrdersResponseI}),
+      ApiQuery({name: 'page', type: 'string', required: false})
+    ),
   getCart: () =>
     applyDecorators(
       ApiOperation({summary: 'Get cart'}),
