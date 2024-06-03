@@ -29,5 +29,6 @@ export const orderInformationSchema = yup.object().shape({
 
 export const completeOrderSchema = yup.object().shape({
   products: yup.array().of(addToCartSchema).min(1).required(),
-  orderInformation: orderInformationSchema
+  orderInformation: orderInformationSchema,
+  totalPrice: yup.number().positive().required()
 });

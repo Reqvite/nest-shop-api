@@ -4,15 +4,19 @@ import {ObjectId} from 'mongodb';
 import mongoose, {Model, ObjectId as ObjectIdType} from 'mongoose';
 import {ErrorMessages} from '@/const/errors.const';
 import {CustomErrors} from '@/services/customErrors.service';
+import {GetOrdersResponseI} from '@/types/cart.interface';
 import {ProductWithOrderedQuantity} from '@/types/product.interface';
 import {CartItem} from '@/types/user.interface';
 import {User} from '../auth/model/user.model';
+import {getQueryParams} from '../product/helpers/getQueryParams';
 import {Product} from '../product/model/product.model';
+import {ProductsQueryParamsSchemaType} from '../product/validation/getProductsQueryParams.schema';
 import {AddToCartDto} from './dto/addToCart.dto';
 import {CompleteOrderDto} from './dto/completeOrder.dto';
 import {checkProductQuantity, checkProductsQuantity} from './helpers/checkQuantity';
 import {getBillingInfo} from './helpers/getBillingInfo';
 import {Order} from './model/order.model';
+import {getOrdersPipeline} from './pipelines/getOrders.pipeline';
 
 @Injectable()
 export class CartService {
@@ -22,6 +26,23 @@ export class CartService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Order.name) private readonly orderModel: Model<User>
   ) {}
+
+  async getOrders(_id: string, params: ProductsQueryParamsSchemaType): Promise<GetOrdersResponseI> {
+    const {query, skip, pageIdx, itemsLimit} = getQueryParams(params);
+    const results = await this.orderModel.aggregate(getOrdersPipeline({skip, itemsLimit, _id, query}));
+    const orders = results[0]?.orders;
+    const totalResults = results[0]?.totalResults[0]?.count || 0;
+    const totalOrders = results[0]?.totalOrders[0]?.total || 0;
+    const totalPages = Math.ceil(totalResults / itemsLimit);
+
+    return {
+      results: orders,
+      totalResults: totalResults[0]?.count,
+      currentPage: pageIdx,
+      totalPages,
+      totalItems: totalOrders
+    };
+  }
 
   async getCart(_id: string): Promise<ProductWithOrderedQuantity[]> {
     const cart = await this.userModel.aggregate([
@@ -51,7 +72,7 @@ export class CartService {
     return cart;
   }
 
-  async completeOrder({products, orderInformation}: CompleteOrderDto, userId: ObjectIdType): Promise<void> {
+  async completeOrder({products, orderInformation, totalPrice}: CompleteOrderDto, userId: ObjectIdType): Promise<void> {
     const session = await this.connection.startSession();
     session.startTransaction();
 
@@ -81,7 +102,9 @@ export class CartService {
       await Promise.all([
         this.productModel.bulkWrite(updatedProducts, {session}),
         this.userModel.findByIdAndUpdate({_id: userId}, {cart: []}, {session}),
-        this.orderModel.create([{products, userId, billingInfo: getBillingInfo(orderInformation)}], {session})
+        this.orderModel.create([{products, userId, billingInfo: getBillingInfo(orderInformation), totalPrice}], {
+          session
+        })
       ]);
 
       await session.commitTransaction();
