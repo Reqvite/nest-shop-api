@@ -58,4 +58,14 @@ export class ReviewService {
     await review.save();
     return review;
   }
+
+  async deleteReview(reviewId: ObjectIdType, userId: ObjectIdType): Promise<void> {
+    const deletedReview = await this.reviewModel.findOneAndDelete({_id: reviewId, userId: userId});
+
+    if (!deletedReview) {
+      throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Review'));
+    }
+
+    await this.reviewModel.updateOne({children: reviewId}, {$pull: {children: reviewId}});
+  }
 }
