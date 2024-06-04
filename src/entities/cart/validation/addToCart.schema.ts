@@ -1,13 +1,7 @@
-import mongoose from 'mongoose';
 import * as yup from 'yup';
+import {yupValidation} from '@/const/validation.const';
 
 export const addToCartSchema = yup.object().shape({
-  _id: yup
-    .string()
-    .test(
-      'is-objectid',
-      '${path} is not a valid ObjectId',
-      (value) => value === undefined || mongoose.Types.ObjectId.isValid(value)
-    ),
+  _id: yupValidation.getObjectId(),
   quantity: yup.number().integer().positive().required()
 });

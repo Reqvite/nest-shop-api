@@ -1,4 +1,13 @@
+import mongoose from 'mongoose';
 import * as yup from 'yup';
+
+const objectIdValidation = yup
+  .string()
+  .test(
+    'is-objectid',
+    '${path} is not a valid ObjectId',
+    (value) => value === undefined || mongoose.Types.ObjectId.isValid(value)
+  );
 
 export const yupValidation = {
   getMinMaxString: ({min, max, required = true}: {min: number; max: number; required?: boolean}) =>
@@ -8,5 +17,7 @@ export const yupValidation = {
   getIntegerPositive: ({min = 1, max = 1000000, required = true}: {min?: number; max?: number; required?: boolean}) =>
     required
       ? yup.number().min(min).min(max).integer().positive().required()
-      : yup.number().min(min).min(max).integer().positive()
+      : yup.number().min(min).min(max).integer().positive(),
+  getObjectId: ({required = true}: {required?: boolean} = {}) =>
+    required ? objectIdValidation.required() : objectIdValidation
 };
