@@ -2,7 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {InjectConnection, InjectModel} from '@nestjs/mongoose';
 import {ObjectId} from 'mongodb';
 import mongoose, {Model, ObjectId as ObjectIdType} from 'mongoose';
-import {ErrorMessages} from '@/const/errors.const';
+import {isProductExist} from '@/lib/helpers/isProductExist.helper';
 import {CustomErrors} from '@/services/customErrors.service';
 import {GetOrdersResponseI} from '@/types/cart.interface';
 import {ProductWithOrderedQuantity} from '@/types/product.interface';
@@ -118,10 +118,8 @@ export class CartService {
 
   async addToCart(dto: AddToCartDto, userId: ObjectIdType): Promise<CartItem[]> {
     const product = await this.productModel.findById({_id: dto._id});
-    if (!product) {
-      throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Product'));
-    }
 
+    isProductExist(product);
     checkProductQuantity(product, dto);
 
     const result = await this.userModel.findOneAndUpdate(
@@ -146,10 +144,8 @@ export class CartService {
 
   async updateCart(dto: AddToCartDto, userId: ObjectIdType): Promise<CartItem[]> {
     const product = await this.productModel.findById({_id: dto._id});
-    if (!product) {
-      throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Product'));
-    }
 
+    isProductExist(product);
     checkProductQuantity(product, dto);
 
     const result = await this.userModel.findOneAndUpdate(

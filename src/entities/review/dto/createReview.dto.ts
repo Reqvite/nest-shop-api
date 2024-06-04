@@ -9,6 +9,12 @@ export class CreateReviewDto {
   parentId: ObjectId;
 
   @ApiProperty({
+    example: '6649e05e1c375dd68fffe7b4',
+    required: true
+  })
+  productId: ObjectId;
+
+  @ApiProperty({
     example: 'Review message',
     required: true
   })

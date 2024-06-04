@@ -1,10 +1,10 @@
 import {Injectable} from '@nestjs/common';
 import {InjectModel} from '@nestjs/mongoose';
 import {Model, ObjectId} from 'mongoose';
-import {ErrorMessages} from '@/const/errors.const';
 import {CategoriesEnum} from '@/enums/categories.enum';
 import {SortOrder} from '@/enums/sortBy.enum';
 import {getEnumNumberValues} from '@/lib/helpers/getEnumNumberValues.heleper';
+import {isProductExist} from '@/lib/helpers/isProductExist.helper';
 import {CustomErrors} from '@/services/customErrors.service';
 import {
   GetProductsQuantityByCategoryResponseI,
@@ -29,9 +29,7 @@ export class ProductService {
 
   async getProductById(id: string): Promise<Product> {
     const product = await this.productModel.findById(id).lean();
-    if (!product) {
-      throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Product'));
-    }
+    isProductExist(product);
 
     return product;
   }
@@ -139,17 +137,13 @@ export class ProductService {
 
   async updateById(body: CreateProductDto, id: string): Promise<Product> {
     const product = await this.productModel.findByIdAndUpdate(id, body, {new: true});
-    if (!product) {
-      throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Product'));
-    }
+    isProductExist(product);
     return product;
   }
   async updateWishlist(productId: ObjectId, userId: ObjectId): Promise<UserWishlistResponseDto> {
     const product = await this.productModel.findById(productId);
 
-    if (!product) {
-      throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Product'));
-    }
+    isProductExist(product);
 
     let user = null;
 

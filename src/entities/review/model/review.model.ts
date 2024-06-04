@@ -7,6 +7,9 @@ export type ReviewDocument = HydratedDocument<Review>;
 export class Review {
   _id: MongooseSchema.Types.ObjectId;
 
+  @Prop({required: true, type: MongooseSchema.Types.ObjectId, ref: 'Product'})
+  productId: MongooseSchema.Types.ObjectId;
+
   @Prop({required: true, type: MongooseSchema.Types.ObjectId, ref: 'User'})
   userId: MongooseSchema.Types.ObjectId;
 

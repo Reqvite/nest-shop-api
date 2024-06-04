@@ -57,6 +57,9 @@ export class Product {
 
   @Prop({default: 0})
   discount?: number;
+
+  @Prop({type: [{type: MongooseSchema.Types.ObjectId, ref: 'Review'}], default: []})
+  reviews: MongooseSchema.Types.ObjectId[];
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
