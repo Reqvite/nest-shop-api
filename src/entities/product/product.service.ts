@@ -28,7 +28,7 @@ export class ProductService {
   ) {}
 
   async getProductById(id: string): Promise<Product> {
-    const product = await this.productModel.findById(id).lean();
+    const product = await this.productModel.findById(id).lean().select('+reviews');
     isProductExist(product);
 
     return product;
@@ -140,6 +140,7 @@ export class ProductService {
     isProductExist(product);
     return product;
   }
+
   async updateWishlist(productId: ObjectId, userId: ObjectId): Promise<UserWishlistResponseDto> {
     const product = await this.productModel.findById(productId);
 

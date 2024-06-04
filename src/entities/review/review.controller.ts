@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Param, Post, Put, UseGuards} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Post, Put, UseGuards} from '@nestjs/common';
 import {ApiTags} from '@nestjs/swagger';
 import {ObjectId} from 'mongoose';
 import {GetCurrentUser} from '@/commons/decorators/getCurrentUser.decorator';
@@ -18,6 +18,12 @@ import {updateReviewSchema} from './validation/updateReview.schema';
 @Controller('reviews')
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
+
+  @Get(':id')
+  @ReviewSwagger.createReview()
+  async getProductReviews(@Param('id', new ObjectIdValidationPipe()) id: string): Promise<Review[]> {
+    return this.reviewService.getProductReviews(id);
+  }
 
   @Post()
   @UseGuards(AccessAuthGuard)
