@@ -50,8 +50,7 @@ export class ReviewService {
       },
       {
         $project: {
-          user: 0,
-          userId: 0
+          user: 0
         }
       }
     ]);
