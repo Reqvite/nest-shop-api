@@ -33,7 +33,7 @@ export class ProductService {
 
     const productWithReviewCount = {
       ...product,
-      reviewCount: product.reviews.length
+      reviewCount: product?.reviews?.length
     };
 
     return productWithReviewCount;

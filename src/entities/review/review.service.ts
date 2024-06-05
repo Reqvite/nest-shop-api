@@ -31,7 +31,29 @@ export class ReviewService {
           maxDepth: 1
         }
       },
-      {$match: {parentId: null}}
+      {$match: {parentId: null}},
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'user'
+        }
+      },
+      {
+        $unwind: '$user'
+      },
+      {
+        $addFields: {
+          username: {$concat: ['$user.firstName', ' ', '$user.lastName']}
+        }
+      },
+      {
+        $project: {
+          user: 0,
+          userId: 0
+        }
+      }
     ]);
 
     return reviews;
@@ -42,10 +64,9 @@ export class ReviewService {
     isProductExist(product);
     const session = await this.connection.startSession();
     session.startTransaction();
-    let review;
 
     try {
-      review = await this.reviewModel.create([{message, productId, rating, userId, parentId}], {session});
+      const review = await this.reviewModel.create([{message, productId, rating, userId, parentId}], {session});
       await this.productModel.findByIdAndUpdate(productId, {$push: {reviews: review[0]?._id}}, {session});
 
       if (parentId) {
@@ -54,13 +75,12 @@ export class ReviewService {
 
       await session.commitTransaction();
       session.endSession();
+      return review[0];
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
       throw error;
     }
-
-    return review[0];
   }
 
   async updateReview({_id, message}: UpdateReviewDto, userId: ObjectIdType): Promise<Review> {
