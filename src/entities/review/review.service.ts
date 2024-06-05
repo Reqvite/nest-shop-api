@@ -66,6 +66,29 @@ export class ReviewService {
       throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Review'));
     }
 
-    await this.reviewModel.updateOne({children: reviewId}, {$pull: {children: reviewId}});
+    const session = await this.connection.startSession();
+    session.startTransaction();
+
+    try {
+      if (deletedReview.children.length !== 0) {
+        await this.reviewModel.deleteMany({_id: {$in: deletedReview.children}}, {session});
+      }
+
+      const reviewsToRemove = [reviewId, ...deletedReview.children];
+      await this.productModel.findOneAndUpdate(
+        {_id: deletedReview.productId},
+        {$pull: {reviews: {$in: reviewsToRemove}}},
+        {session}
+      );
+
+      await this.reviewModel.updateOne({children: reviewId}, {$pull: {children: reviewId}}, {session});
+
+      await session.commitTransaction();
+      session.endSession();
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
   }
 }
