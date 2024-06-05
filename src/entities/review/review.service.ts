@@ -37,7 +37,7 @@ export class ReviewService {
     return reviews;
   }
 
-  async createReview({parentId, productId, message}: CreateReviewDto, userId: ObjectIdType): Promise<Review> {
+  async createReview({parentId, productId, rating, message}: CreateReviewDto, userId: ObjectIdType): Promise<Review> {
     const product = await this.productModel.findById(productId);
     isProductExist(product);
     const session = await this.connection.startSession();
@@ -45,7 +45,7 @@ export class ReviewService {
     let review;
 
     try {
-      review = await this.reviewModel.create([{message, productId, userId, parentId}], {session});
+      review = await this.reviewModel.create([{message, productId, rating, userId, parentId}], {session});
       await this.productModel.findByIdAndUpdate(productId, {$push: {reviews: review[0]?._id}}, {session});
 
       if (parentId) {
@@ -86,6 +86,29 @@ export class ReviewService {
       throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Review'));
     }
 
-    await this.reviewModel.updateOne({children: reviewId}, {$pull: {children: reviewId}});
+    const session = await this.connection.startSession();
+    session.startTransaction();
+
+    try {
+      if (deletedReview.children.length !== 0) {
+        await this.reviewModel.deleteMany({_id: {$in: deletedReview.children}}, {session});
+      }
+
+      const reviewsToRemove = [reviewId, ...deletedReview.children];
+      await this.productModel.findOneAndUpdate(
+        {_id: deletedReview.productId},
+        {$pull: {reviews: {$in: reviewsToRemove}}},
+        {session}
+      );
+
+      await this.reviewModel.updateOne({children: reviewId}, {$pull: {children: reviewId}}, {session});
+
+      await session.commitTransaction();
+      session.endSession();
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
   }
 }

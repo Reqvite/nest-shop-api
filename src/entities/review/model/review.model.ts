@@ -13,6 +13,9 @@ export class Review {
   @Prop({required: true, type: MongooseSchema.Types.ObjectId, ref: 'User'})
   userId: MongooseSchema.Types.ObjectId;
 
+  @Prop({required: true})
+  rating: number;
+
   @Prop({type: MongooseSchema.Types.ObjectId, ref: 'Review', default: null})
   parentId: MongooseSchema.Types.ObjectId | null;
 
