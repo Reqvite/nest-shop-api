@@ -19,10 +19,9 @@ export class ReviewService {
     isProductExist(product);
     const session = await this.connection.startSession();
     session.startTransaction();
-    let review;
 
     try {
-      review = await this.reviewModel.create([{message, productId, userId}], {session});
+      const review = await this.reviewModel.create([{message, productId, userId}], {session});
       await this.productModel.findByIdAndUpdate(productId, {$push: {reviews: review[0]?._id}}, {session});
 
       if (parentId) {
@@ -31,12 +30,11 @@ export class ReviewService {
 
       await session.commitTransaction();
       session.endSession();
+      return review[0];
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
       throw error;
     }
-
-    return review[0];
   }
 }
