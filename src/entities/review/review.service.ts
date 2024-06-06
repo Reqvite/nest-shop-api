@@ -60,16 +60,16 @@ export class ReviewService {
   }
 
   async deleteReview(reviewId: ObjectIdType, userId: ObjectIdType): Promise<void> {
-    const deletedReview = await this.reviewModel.findOneAndDelete({_id: reviewId, userId: userId});
-
-    if (!deletedReview) {
-      throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Review'));
-    }
-
     const session = await this.connection.startSession();
     session.startTransaction();
 
     try {
+      const deletedReview = await this.reviewModel.findOneAndDelete({_id: reviewId, userId: userId}, {session});
+
+      if (!deletedReview) {
+        throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Review'));
+      }
+
       if (deletedReview.children.length !== 0) {
         await this.reviewModel.deleteMany({_id: {$in: deletedReview.children}}, {session});
       }
