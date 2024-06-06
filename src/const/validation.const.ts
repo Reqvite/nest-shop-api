@@ -3,11 +3,7 @@ import * as yup from 'yup';
 
 const objectIdValidation = yup
   .string()
-  .test(
-    'is-objectid',
-    '${path} is not a valid ObjectId',
-    (value) => value === undefined || mongoose.Types.ObjectId.isValid(value)
-  );
+  .test('is-objectid', '${path} is not a valid ObjectId', (value) => !value || mongoose.Types.ObjectId.isValid(value));
 
 export const yupValidation = {
   getMinMaxString: ({min, max, required = true}: {min: number; max: number; required?: boolean}) =>
