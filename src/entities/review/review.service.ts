@@ -82,7 +82,7 @@ export class ReviewService {
     }
   }
 
-  async updateReview({_id, message}: UpdateReviewDto, userId: ObjectIdType): Promise<Review> {
+  async updateReview({_id, message, rating}: UpdateReviewDto, userId: ObjectIdType): Promise<Review> {
     const review = await this.reviewModel.findById(_id);
 
     if (!review) {
@@ -94,6 +94,7 @@ export class ReviewService {
     }
 
     review.message = message;
+    review.rating = rating;
     await review.save();
     return review;
   }

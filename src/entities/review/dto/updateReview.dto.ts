@@ -9,6 +9,12 @@ export class UpdateReviewDto {
   _id: ObjectId;
 
   @ApiProperty({
+    example: 5,
+    required: true
+  })
+  rating: number;
+
+  @ApiProperty({
     example: 'Updated message',
     required: true
   })
