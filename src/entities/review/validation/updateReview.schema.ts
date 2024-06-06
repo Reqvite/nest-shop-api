@@ -4,6 +4,6 @@ import {messageValidation, ratingValidation} from '../const/validation';
 
 export const updateReviewSchema = yup.object().shape({
   _id: yupValidation.getObjectId(),
-  rating: ratingValidation,
-  message: messageValidation
+  rating: ratingValidation({required: false}),
+  message: messageValidation({required: false})
 });
