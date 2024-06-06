@@ -15,6 +15,12 @@ export class CreateReviewDto {
   productId: ObjectId;
 
   @ApiProperty({
+    example: 5,
+    required: true
+  })
+  rating: number;
+
+  @ApiProperty({
     example: 'Review message',
     required: true
   })
