@@ -20,18 +20,7 @@ export class ReviewService {
 
   async getProductReviews(productId: string): Promise<Review[]> {
     const reviews = await this.reviewModel.aggregate([
-      {$match: {productId: new ObjectId(productId)}},
-      {
-        $graphLookup: {
-          from: 'reviews',
-          startWith: '$_id',
-          connectFromField: '_id',
-          connectToField: 'parentId',
-          as: 'children',
-          maxDepth: 1
-        }
-      },
-      {$match: {parentId: null}},
+      {$match: {productId: new ObjectId(productId), parentId: null}},
       {
         $lookup: {
           from: 'users',
@@ -40,17 +29,36 @@ export class ReviewService {
           as: 'user'
         }
       },
-      {
-        $unwind: '$user'
-      },
+      {$unwind: '$user'},
       {
         $addFields: {
           username: {$concat: ['$user.firstName', ' ', '$user.lastName']}
         }
       },
       {
-        $project: {
-          user: 0
+        $lookup: {
+          from: 'reviews',
+          localField: '_id',
+          foreignField: 'parentId',
+          as: 'children'
+        }
+      },
+      {
+        $addFields: {
+          children: {
+            $map: {
+              input: '$children',
+              as: 'child',
+              in: {
+                $mergeObjects: [
+                  '$$child',
+                  {
+                    username: '$username'
+                  }
+                ]
+              }
+            }
+          }
         }
       }
     ]);
