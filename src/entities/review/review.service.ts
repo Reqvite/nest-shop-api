@@ -49,7 +49,7 @@ export class ReviewService {
     }
 
     if (review.userId.toString() !== userId.toString()) {
-      throw CustomErrors.AuthorizationError();
+      throw CustomErrors.AuthenticationError();
     }
 
     review.message = message;
