@@ -1,18 +1,12 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {ObjectId} from 'mongoose';
 
-export class CreateReviewDto {
-  @ApiProperty({
-    example: '6649e05e1c375dd68fffe7b4',
-    required: false
-  })
-  parentId: ObjectId;
-
+export class UpdateReviewDto {
   @ApiProperty({
     example: '6649e05e1c375dd68fffe7b4',
     required: true
   })
-  productId: ObjectId;
+  _id: ObjectId;
 
   @ApiProperty({
     example: 5,
@@ -21,7 +15,7 @@ export class CreateReviewDto {
   rating: number;
 
   @ApiProperty({
-    example: 'Review message',
+    example: 'Updated message',
     required: true
   })
   message: string;

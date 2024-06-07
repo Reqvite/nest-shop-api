@@ -1,9 +1,12 @@
 import {Injectable} from '@nestjs/common';
 import {InjectConnection, InjectModel} from '@nestjs/mongoose';
 import mongoose, {Model, ObjectId as ObjectIdType} from 'mongoose';
+import {ErrorMessages} from '@/const/errors.const';
 import {isProductExist} from '@/lib/helpers/isProductExist.helper';
+import {CustomErrors} from '@/services/customErrors.service';
 import {Product} from '../product/model/product.model';
 import {CreateReviewDto} from './dto/createReview.dto';
+import {UpdateReviewDto} from './dto/updateReview.dto';
 import {Review} from './model/review.model';
 
 @Injectable()
@@ -36,5 +39,22 @@ export class ReviewService {
       session.endSession();
       throw error;
     }
+  }
+
+  async updateReview({_id, message, rating}: UpdateReviewDto, userId: ObjectIdType): Promise<Review> {
+    const review = await this.reviewModel.findById(_id);
+
+    if (!review) {
+      throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Review'));
+    }
+
+    if (review.userId.toString() !== userId.toString()) {
+      throw CustomErrors.AuthenticationError();
+    }
+
+    review.message = message;
+    review.rating = rating;
+    await review.save();
+    return review;
   }
 }
