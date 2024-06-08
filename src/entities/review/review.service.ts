@@ -57,4 +57,37 @@ export class ReviewService {
     await review.save();
     return review;
   }
+
+  async deleteReview(reviewId: ObjectIdType, userId: ObjectIdType): Promise<void> {
+    const session = await this.connection.startSession();
+    session.startTransaction();
+
+    try {
+      const deletedReview = await this.reviewModel.findOneAndDelete({_id: reviewId, userId: userId}, {session});
+
+      if (!deletedReview) {
+        throw CustomErrors.NotFoundError(ErrorMessages.NOT_FOUND('Review'));
+      }
+
+      if (deletedReview.children.length !== 0) {
+        await this.reviewModel.deleteMany({_id: {$in: deletedReview.children}}, {session});
+      }
+
+      const reviewsToRemove = [reviewId, ...deletedReview.children];
+      await this.productModel.findOneAndUpdate(
+        {_id: deletedReview.productId},
+        {$pull: {reviews: {$in: reviewsToRemove}}},
+        {session}
+      );
+
+      await this.reviewModel.updateOne({children: reviewId}, {$pull: {children: reviewId}}, {session});
+
+      await session.commitTransaction();
+      session.endSession();
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
+  }
 }

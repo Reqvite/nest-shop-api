@@ -18,5 +18,11 @@ export const ReviewSwagger = {
       ApiBearerAuth(),
       ApiOperation({summary: 'Update review'}),
       ApiBody({type: UpdateReviewDto})
+    ),
+  deleteReview: () =>
+    applyDecorators(
+      ApiBearerAuth(),
+      ApiResponse({status: HttpStatus.OK, description: SuccessMessages.SUCCESS}),
+      ApiOperation({summary: 'Delete product review'})
     )
 };

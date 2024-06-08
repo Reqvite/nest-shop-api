@@ -1,7 +1,9 @@
-import {Body, Controller, Post, Put, UseGuards} from '@nestjs/common';
+import {Body, Controller, Delete, Param, Post, Put, UseGuards} from '@nestjs/common';
 import {ApiTags} from '@nestjs/swagger';
+import {ObjectId} from 'mongoose';
 import {GetCurrentUser} from '@/commons/decorators/getCurrentUser.decorator';
 import {AccessAuthGuard} from '@/commons/guards/jwt.guard';
+import {ObjectIdValidationPipe} from '@/commons/pipes/objectIdValidation.pipe';
 import {YupValidationPipe} from '@/commons/pipes/yupValidation.pipe';
 import {JwtPayloadI} from '@/types/jwt.interface';
 import {CreateReviewDto} from './dto/createReview.dto';
@@ -35,5 +37,15 @@ export class ReviewController {
     @GetCurrentUser() {_id: userId}: JwtPayloadI
   ): Promise<Review> {
     return this.reviewService.updateReview(dto, userId);
+  }
+
+  @Delete(':id')
+  @UseGuards(AccessAuthGuard)
+  @ReviewSwagger.deleteReview()
+  async deleteReview(
+    @Param('id', new ObjectIdValidationPipe()) id: ObjectId,
+    @GetCurrentUser() {_id: userId}: JwtPayloadI
+  ): Promise<void> {
+    return this.reviewService.deleteReview(id, userId);
   }
 }
