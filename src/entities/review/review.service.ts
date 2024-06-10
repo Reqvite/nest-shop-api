@@ -20,6 +20,7 @@ export class ReviewService {
 
   async getProductReviews(productId: string): Promise<Review[]> {
     const reviews = await this.reviewModel.aggregate([
+      {$sort: {createdAt: -1, _id: 1}},
       {$match: {productId: new ObjectId(productId), parentId: null}},
       {
         $lookup: {
