@@ -24,5 +24,6 @@ export const ErrorMessages = {
   MIN_QUANTITY: (min: number) => `Quantity must be at least ${min}.`,
   OUT_OF_STOCK: 'Product is out of stock.',
   ITEMS_LEFT: (max: number) => `Only ${max} left.`,
-  ACCEPT_PRIVACY: 'Please, accept the privacy policy.'
+  ACCEPT_PRIVACY: 'Please, accept the privacy policy.',
+  MISSING_HEADER: (header: string) => `Missing ${header} header.`
 };

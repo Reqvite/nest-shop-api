@@ -4,9 +4,11 @@ import {HttpExceptionFilter} from '@/commons/filters/http-exception.filter';
 import {ResponseInterceptor} from '@/commons/interceptors/response.interceptor';
 import {swaggerConfig} from '@/configuration/swagger.config';
 import {AppModule} from '@/entities/app/app.module';
+import rawBodyMiddleware from './commons/middlewares/rawBody.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(rawBodyMiddleware());
   const document = SwaggerModule.createDocument(app, swaggerConfig(process.env.API_URL));
   SwaggerModule.setup('api-docs', app, document);
   app.enableCors();
