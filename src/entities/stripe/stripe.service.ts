@@ -4,7 +4,6 @@ import Stripe from 'stripe';
 import {priceService} from '@/services/price.service';
 import {CartService} from '../cart/cart.service';
 import {CreateCheckoutSessionDto} from './dto/createCheckoutSession.dto';
-import {StripeWebhookEvents} from './enums/webhookEvents.enum';
 import {StripeSessionI} from './types/types';
 
 const defaultTax = 1.15;
@@ -51,19 +50,5 @@ export class StripeService {
     });
 
     return session;
-  }
-
-  async constructEventFromPayload(signature: string, payload: Buffer) {
-    const webhookSecret = this.configService.get('STRIPE_WEBHOOK_SECRET');
-    return this.stripe.webhooks.constructEvent(payload, signature, webhookSecret);
-  }
-
-  async handleWebhookEvent(event: Stripe.Event) {
-    switch (event.type) {
-      case StripeWebhookEvents.PaymentIntentSucceeded:
-        const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        console.log('PaymentIntent was successful!', paymentIntent);
-        break;
-    }
   }
 }
