@@ -27,11 +27,16 @@ export class ProductService {
     @InjectModel(User.name) private readonly userModel: Model<User>
   ) {}
 
-  async getProductById(id: string): Promise<Product> {
-    const product = await this.productModel.findById(id).lean();
+  async getProductById(id: string): Promise<Product & {reviewCount: number}> {
+    const product = await this.productModel.findById(id).lean().select('+reviews');
     isProductExist(product);
 
-    return product;
+    const productWithReviewCount = {
+      ...product,
+      reviewCount: product?.reviews?.length
+    };
+
+    return productWithReviewCount;
   }
 
   async getUserWishlist(params: ProductsQueryParamsSchemaType, userId: ObjectId): Promise<GetWishlistResponseI> {
@@ -140,6 +145,7 @@ export class ProductService {
     isProductExist(product);
     return product;
   }
+
   async updateWishlist(productId: ObjectId, userId: ObjectId): Promise<UserWishlistResponseDto> {
     const product = await this.productModel.findById(productId);
 

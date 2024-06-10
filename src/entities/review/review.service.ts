@@ -1,5 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {InjectConnection, InjectModel} from '@nestjs/mongoose';
+import {ObjectId} from 'mongodb';
 import mongoose, {Model, ObjectId as ObjectIdType} from 'mongoose';
 import {ErrorMessages} from '@/const/errors.const';
 import {isProductExist} from '@/lib/helpers/isProductExist.helper';
@@ -17,14 +18,63 @@ export class ReviewService {
     @InjectModel(Product.name) private readonly productModel: Model<Product>
   ) {}
 
-  async createReview({parentId, productId, message}: CreateReviewDto, userId: ObjectIdType): Promise<Review> {
+  async getProductReviews(productId: string): Promise<Review[]> {
+    const reviews = await this.reviewModel.aggregate([
+      {$sort: {createdAt: -1, _id: 1}},
+      {$match: {productId: new ObjectId(productId), parentId: null}},
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'user'
+        }
+      },
+      {$unwind: '$user'},
+      {
+        $addFields: {
+          username: {$concat: ['$user.firstName', ' ', '$user.lastName']}
+        }
+      },
+      {
+        $lookup: {
+          from: 'reviews',
+          localField: '_id',
+          foreignField: 'parentId',
+          as: 'children'
+        }
+      },
+      {
+        $addFields: {
+          children: {
+            $map: {
+              input: '$children',
+              as: 'child',
+              in: {
+                $mergeObjects: [
+                  '$$child',
+                  {
+                    username: '$username'
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    ]);
+
+    return reviews;
+  }
+
+  async createReview({parentId, productId, rating, message}: CreateReviewDto, userId: ObjectIdType): Promise<Review> {
     const product = await this.productModel.findById(productId);
     isProductExist(product);
     const session = await this.connection.startSession();
     session.startTransaction();
 
     try {
-      const review = await this.reviewModel.create([{message, productId, userId}], {session});
+      const review = await this.reviewModel.create([{message, productId, rating, userId, parentId}], {session});
       await this.productModel.findByIdAndUpdate(productId, {$push: {reviews: review[0]?._id}}, {session});
 
       if (parentId) {
