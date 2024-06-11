@@ -22,13 +22,7 @@ class PriceService {
   }
 
   getTax({price, tax = defaultTax}: {price: number; tax?: number}): number {
-    return this.getFixedPrice((price / 100) * tax);
-  }
-
-  getTotal(items: ProductWithOrderedQuantity[], tax = defaultTax): number {
-    const subTotal = this.getSubtotal(items);
-    const taxTotal = this.getTax({price: subTotal, tax});
-    return this.getFixedPrice(subTotal + taxTotal);
+    return this.getFixedPrice(price * tax);
   }
 }
 
