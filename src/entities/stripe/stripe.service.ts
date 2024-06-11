@@ -21,8 +21,7 @@ export class StripeService {
 
   async findOrCreateCustomer(orderInformation: BillingInfo, userId: string): Promise<Stripe.Customer> {
     const existingCustomers = await this.stripe.customers.list({
-      email: orderInformation.email,
-      limit: 1
+      email: orderInformation.email
     });
 
     if (existingCustomers.data.length > 0) {
