@@ -19,7 +19,7 @@ import {AppService} from './app.service';
     ProductModule,
     CartModule,
     ReviewModule,
-    // StripeModule.forRootAsync(),
+    StripeModule.forRootAsync(),
     MongooseModule.forRootAsync(mongoConfig),
     LoggerModule.forRoot(loggerConfiguration),
     ConfigModule.forRoot(envConfiguration)
