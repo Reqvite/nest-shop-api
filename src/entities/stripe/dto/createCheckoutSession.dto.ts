@@ -1,6 +1,8 @@
 import {BillingInfo} from '@/types/cart.interface';
+import {CartItem} from '@/types/user.interface';
 
 export class CreateCheckoutSessionDto {
-  userId: string;
+  products: CartItem[];
   orderInformation: BillingInfo;
+  totalPrice: number;
 }

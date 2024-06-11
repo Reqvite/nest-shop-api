@@ -1,12 +1,10 @@
 import {Inject, Injectable} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
 import Stripe from 'stripe';
-import {priceService} from '@/services/price.service';
 import {CartService} from '../cart/cart.service';
 import {CreateCheckoutSessionDto} from './dto/createCheckoutSession.dto';
+import {getLineItems} from './helpers/getLineItems';
 import {StripeSessionI} from './types/types';
-
-const defaultTax = 1.15;
 
 @Injectable()
 export class StripeService {
@@ -19,32 +17,29 @@ export class StripeService {
     this.stripe = new Stripe(this.apiKey);
   }
 
-  async createCheckoutSession({userId, orderInformation}: CreateCheckoutSessionDto): Promise<StripeSessionI> {
-    const products = await this.cartService.getCart(userId);
+  async createCheckoutSession(
+    {products, orderInformation, totalPrice}: CreateCheckoutSessionDto,
+    userId: string
+  ): Promise<StripeSessionI> {
+    const productsDetails = await this.cartService.getCart(userId);
+    const line_items = getLineItems(productsDetails);
 
-    const line_items = products.map((product) => {
-      const discountedPrice = priceService.getDiscountPrice({discount: product.discount, price: product.price});
-      const priceWithTax = discountedPrice * defaultTax;
-      const unit_amount = Math.round(priceWithTax * 100);
-
-      return {
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: product.title,
-            images: [product.images[0].src]
-          },
-          unit_amount
-        },
-        quantity: product.orderedQuantity
-      };
+    const customer = await this.stripe.customers.create({
+      name: `${orderInformation.firstName} ${orderInformation.lastName}`,
+      email: orderInformation.email,
+      metadata: {
+        userId,
+        products: JSON.stringify(products),
+        orderInformation: JSON.stringify(orderInformation),
+        totalPrice
+      }
     });
 
     const session = await this.stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items,
       mode: 'payment',
-      customer_email: orderInformation.email,
+      customer: customer.id,
       success_url: `${this.configService.get('CLIENT_URL')}/success`,
       cancel_url: `${this.configService.get('CLIENT_URL')}/shopping-cart`
     });

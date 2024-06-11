@@ -1,7 +1,6 @@
+import {defaultTax} from '@/const/defaultValues';
 import {PriceI} from '@/types/price';
 import {ProductWithOrderedQuantity} from '@/types/product.interface';
-
-const defaultTax = 15;
 
 class PriceService {
   getFixedPrice(price: number): number {
