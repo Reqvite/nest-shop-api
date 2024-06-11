@@ -32,6 +32,12 @@ export class StripeService {
     return await this.stripe.customers.create({
       name: `${orderInformation.firstName} ${orderInformation.lastName}`,
       email: orderInformation.email,
+      address: {
+        city: orderInformation.city,
+        country: orderInformation.country,
+        postal_code: orderInformation.zip,
+        line1: orderInformation.address
+      },
       metadata: {
         userId
       }
@@ -44,10 +50,9 @@ export class StripeService {
   ): Promise<StripeSessionI> {
     const productsDetails = await this.cartService.getCart(userId);
     const line_items = getLineItems(productsDetails);
-
     const customer = await this.findOrCreateCustomer(orderInformation, userId);
 
-    const session = await this.stripe.checkout.sessions.create({
+    return await this.stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items,
       mode: 'payment',
@@ -60,8 +65,6 @@ export class StripeService {
       success_url: `${this.configService.get('CLIENT_URL')}/success`,
       cancel_url: `${this.configService.get('CLIENT_URL')}/shopping-cart`
     });
-
-    return session;
   }
 
   async constructEventFromPayload(signature: string, payload: Buffer) {

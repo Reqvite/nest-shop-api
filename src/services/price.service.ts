@@ -8,27 +8,22 @@ class PriceService {
   }
 
   getDiscountPrice({discount, price}: PriceI): number {
-    return this.getFixedPrice(price - (price * discount) / 100);
-  }
-
-  getSubtotal(items: ProductWithOrderedQuantity[]): number {
-    return this.getFixedPrice(
-      items?.reduce((acc, {price, discount, orderedQuantity}) => {
-        const finalDiscount = discount ?? 0;
-        const finalPrice = finalDiscount ? this.getDiscountPrice({discount: finalDiscount, price}) : price;
-        return acc + finalPrice * orderedQuantity;
-      }, 0)
-    );
+    const discountedPrice = this.getFixedPrice(price - (price * discount) / 100);
+    return discountedPrice;
   }
 
   getTax({price, tax = defaultTax}: {price: number; tax?: number}): number {
-    return this.getFixedPrice(price * tax);
+    return (price / 100) * tax;
   }
 
-  getTotal(items: ProductWithOrderedQuantity[], tax = defaultTax): number {
-    const subTotal = this.getSubtotal(items);
-    const taxTotal = this.getTax({price: subTotal, tax});
-    return this.getFixedPrice(subTotal + taxTotal);
+  getPriceWithTax(product: ProductWithOrderedQuantity): number {
+    const discountedPrice = this.getDiscountPrice({
+      discount: product.discount,
+      price: product.price
+    });
+    const tax = this.getTax({price: discountedPrice});
+    const priceWithTax = discountedPrice + tax;
+    return this.getFixedPrice(priceWithTax * 100);
   }
 }
 
