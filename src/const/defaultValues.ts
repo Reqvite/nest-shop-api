@@ -1,1 +1,1 @@
-export const defaultTax = 15;
+export const defaultTax = 1.15;

@@ -72,7 +72,7 @@ export class CartService {
     return cart;
   }
 
-  async completeOrder({products, orderInformation, totalPrice}: CompleteOrderDto, userId: ObjectIdType): Promise<void> {
+  async completeOrder({products, orderInformation, totalPrice}: CompleteOrderDto, userId: string): Promise<void> {
     const session = await this.connection.startSession();
     session.startTransaction();
 

@@ -22,7 +22,7 @@ class PriceService {
   }
 
   getTax({price, tax = defaultTax}: {price: number; tax?: number}): number {
-    return this.getFixedPrice((price / 100) * tax);
+    return this.getFixedPrice(price * tax);
   }
 
   getTotal(items: ProductWithOrderedQuantity[], tax = defaultTax): number {
