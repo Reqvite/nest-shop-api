@@ -56,7 +56,7 @@ export class CartController {
     @Body(new YupValidationPipe(completeOrderSchema)) dto: CompleteOrderDto,
     @GetCurrentUser() {_id: userId}: JwtPayloadI
   ): Promise<void> {
-    return this.cartService.completeOrder(dto, userId);
+    return this.cartService.completeOrder(dto, String(userId));
   }
 
   @Put()

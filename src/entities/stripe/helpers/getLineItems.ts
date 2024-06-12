@@ -3,9 +3,7 @@ import {ProductWithOrderedQuantity} from '@/types/product.interface';
 
 export const getLineItems = (products: ProductWithOrderedQuantity[]) =>
   products.map((product) => {
-    const discountedPrice = priceService.getDiscountPrice({discount: product.discount, price: product.price});
-    const priceWithTax = priceService.getTax({price: discountedPrice});
-    const unit_amount = Math.round(priceWithTax * 100);
+    const unitAmount = priceService.getPriceWithTax(product);
 
     return {
       price_data: {
@@ -14,7 +12,7 @@ export const getLineItems = (products: ProductWithOrderedQuantity[]) =>
           name: product.title,
           images: [product.images[0].src]
         },
-        unit_amount
+        unit_amount: unitAmount
       },
       quantity: product.orderedQuantity
     };

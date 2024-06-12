@@ -1,4 +1,5 @@
 import {ObjectId} from 'mongodb';
+import {PipelineStage} from 'mongoose';
 
 interface Query {
   [key: string]: any;
@@ -11,11 +12,12 @@ interface GetOrdersPipelineParams {
   query: Query;
 }
 
-export const getOrdersPipeline = ({skip, itemsLimit, _id, query}: GetOrdersPipelineParams) => [
+export const getOrdersPipeline = ({skip, itemsLimit, _id, query}: GetOrdersPipelineParams): PipelineStage[] => [
   {
     $facet: {
       orders: [
         {$match: {userId: new ObjectId(_id), ...query}},
+        {$sort: {createdAt: -1, _id: 1}},
         {$skip: skip},
         {$limit: itemsLimit},
         {
@@ -57,6 +59,7 @@ export const getOrdersPipeline = ({skip, itemsLimit, _id, query}: GetOrdersPipel
             }
           }
         },
+        {$sort: {createdAt: -1, _id: 1}},
         {
           $project: {
             fullProducts: 0

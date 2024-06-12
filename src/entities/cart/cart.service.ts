@@ -72,16 +72,12 @@ export class CartService {
     return cart;
   }
 
-  async completeOrder({products, orderInformation, totalPrice}: CompleteOrderDto, userId: ObjectIdType): Promise<void> {
+  async completeOrder({products, orderInformation, totalPrice}: CompleteOrderDto, userId: string): Promise<void> {
     const session = await this.connection.startSession();
     session.startTransaction();
+    await this.checkProductsStock(products);
 
     try {
-      const productsIds = products.map(({_id}) => _id);
-      const foundedProducts = await this.productModel.find({_id: {$in: productsIds}}).session(session);
-
-      checkProductsQuantity(products, foundedProducts);
-
       const updatedProducts = products.map(({_id, quantity}) => ({
         updateOne: {
           filter: {
@@ -114,6 +110,12 @@ export class CartService {
       session.endSession();
       throw error;
     }
+  }
+
+  async checkProductsStock(products: CartItem[]): Promise<void> {
+    const productsIds = products.map(({_id}) => _id);
+    const foundedProducts = await this.productModel.find({_id: {$in: productsIds}});
+    checkProductsQuantity(products, foundedProducts);
   }
 
   async addToCart(dto: AddToCartDto, userId: ObjectIdType): Promise<CartItem[]> {

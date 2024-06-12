@@ -4,8 +4,8 @@ import Stripe from 'stripe';
 import {BillingInfo} from '@/types/cart.interface';
 import {CartService} from '../cart/cart.service';
 import {CreateCheckoutSessionDto} from './dto/createCheckoutSession.dto';
+import {StripeWebhookEvents} from './enums/webhookEvents.enum';
 import {getLineItems} from './helpers/getLineItems';
-import {StripeSessionI} from './types/types';
 
 @Injectable()
 export class StripeService {
@@ -20,8 +20,7 @@ export class StripeService {
 
   async findOrCreateCustomer(orderInformation: BillingInfo, userId: string): Promise<Stripe.Customer> {
     const existingCustomers = await this.stripe.customers.list({
-      email: orderInformation.email,
-      limit: 1
+      email: orderInformation.email
     });
 
     if (existingCustomers.data.length > 0) {
@@ -31,6 +30,12 @@ export class StripeService {
     return await this.stripe.customers.create({
       name: `${orderInformation.firstName} ${orderInformation.lastName}`,
       email: orderInformation.email,
+      address: {
+        city: orderInformation.city,
+        country: orderInformation.country,
+        postal_code: orderInformation.zip,
+        line1: orderInformation.address
+      },
       metadata: {
         userId
       }
@@ -40,7 +45,8 @@ export class StripeService {
   async createCheckoutSession(
     {products, orderInformation}: CreateCheckoutSessionDto,
     userId: string
-  ): Promise<StripeSessionI> {
+  ): Promise<Stripe.Checkout.Session> {
+    await this.cartService.checkProductsStock(products);
     const productsDetails = await this.cartService.getCart(userId);
     const line_items = getLineItems(productsDetails);
     const customer = await this.findOrCreateCustomer(orderInformation, userId);
@@ -58,5 +64,27 @@ export class StripeService {
       success_url: `${this.configService.get('CLIENT_URL')}/success`,
       cancel_url: `${this.configService.get('CLIENT_URL')}/shopping-cart`
     });
+  }
+
+  async constructEventFromPayload(signature: string, payload: Buffer): Promise<Stripe.Event> {
+    const webhookSecret = this.configService.get('STRIPE_WEBHOOK_SECRET');
+    return this.stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+  }
+
+  async handleWebhookEvent(event: Stripe.Event): Promise<void> {
+    switch (event.type) {
+      case StripeWebhookEvents.CheckoutSessionCompleted:
+        const {metadata, amount_total} = event.data.object;
+        const {products, orderInformation, userId} = metadata;
+        this.cartService.completeOrder(
+          {
+            orderInformation: JSON.parse(orderInformation),
+            products: JSON.parse(products),
+            totalPrice: amount_total / 100
+          },
+          userId
+        );
+        break;
+    }
   }
 }
