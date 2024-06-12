@@ -6,7 +6,6 @@ import {CartService} from '../cart/cart.service';
 import {CreateCheckoutSessionDto} from './dto/createCheckoutSession.dto';
 import {StripeWebhookEvents} from './enums/webhookEvents.enum';
 import {getLineItems} from './helpers/getLineItems';
-import {StripeSessionI} from './types/types';
 
 @Injectable()
 export class StripeService {
@@ -46,7 +45,8 @@ export class StripeService {
   async createCheckoutSession(
     {products, orderInformation}: CreateCheckoutSessionDto,
     userId: string
-  ): Promise<StripeSessionI> {
+  ): Promise<Stripe.Checkout.Session> {
+    await this.cartService.checkProductsStock(products);
     const productsDetails = await this.cartService.getCart(userId);
     const line_items = getLineItems(productsDetails);
     const customer = await this.findOrCreateCustomer(orderInformation, userId);
@@ -66,12 +66,12 @@ export class StripeService {
     });
   }
 
-  async constructEventFromPayload(signature: string, payload: Buffer) {
+  async constructEventFromPayload(signature: string, payload: Buffer): Promise<Stripe.Event> {
     const webhookSecret = this.configService.get('STRIPE_WEBHOOK_SECRET');
     return this.stripe.webhooks.constructEvent(payload, signature, webhookSecret);
   }
 
-  async handleWebhookEvent(event: Stripe.Event) {
+  async handleWebhookEvent(event: Stripe.Event): Promise<void> {
     switch (event.type) {
       case StripeWebhookEvents.CheckoutSessionCompleted:
         const {metadata, amount_total} = event.data.object;
