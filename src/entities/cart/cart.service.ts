@@ -1,7 +1,8 @@
 import {Injectable} from '@nestjs/common';
 import {InjectConnection, InjectModel} from '@nestjs/mongoose';
 import {ObjectId} from 'mongodb';
-import mongoose, {Model, ObjectId as ObjectIdType} from 'mongoose';
+import mongoose, {Model, ObjectId as ObjectIdType, PipelineStage} from 'mongoose';
+import {TimeLine} from '@/enums/timeLine.enum';
 import {isProductExist} from '@/lib/helpers/isProductExist.helper';
 import {CustomErrors} from '@/services/customErrors.service';
 import {GetOrdersResponseI} from '@/types/cart.interface';
@@ -17,6 +18,7 @@ import {checkProductQuantity, checkProductsQuantity} from './helpers/checkQuanti
 import {getBillingInfo} from './helpers/getBillingInfo';
 import {Order} from './model/order.model';
 import {getOrdersPipeline} from './pipelines/getOrders.pipeline';
+import {getOrdersStatisticPipeline} from './pipelines/getOrdersStatistic.pipeline';
 
 @Injectable()
 export class CartService {
@@ -26,6 +28,18 @@ export class CartService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Order.name) private readonly orderModel: Model<User>
   ) {}
+
+  async getOrdersStatistic(timeLine = TimeLine.Week): Promise<any> {
+    let pipeline: PipelineStage[];
+
+    if (timeLine === TimeLine.Week) pipeline = getOrdersStatisticPipeline.weekly();
+    if (timeLine === TimeLine.Month) pipeline = getOrdersStatisticPipeline.monthly();
+    if (timeLine === TimeLine.Quarter) pipeline = getOrdersStatisticPipeline.quarterly();
+
+    const results = await this.orderModel.aggregate(pipeline);
+
+    return results;
+  }
 
   async getOrders(_id: string, params: ProductsQueryParamsSchemaType): Promise<GetOrdersResponseI> {
     const {query, skip, pageIdx, itemsLimit} = getQueryParams(params);
