@@ -28,15 +28,15 @@ export class AuthService {
       ...dto,
       password: await this.hashData(dto.password)
     });
-    await newUser.save();
-    const tokens = await this.getTokens(newUser._id);
+    const user = await newUser.save();
+    const tokens = await this.getTokens(user);
     await this.updateRefreshToken(newUser._id, tokens.refreshToken);
 
     return tokens;
   }
 
   async login(user: User) {
-    const tokens = await this.getTokens(user._id);
+    const tokens = await this.getTokens(user);
     await this.updateRefreshToken(user._id, tokens.refreshToken);
 
     return {user: new UserResponseDto(user), tokens};
@@ -60,7 +60,7 @@ export class AuthService {
       throw CustomErrors.AuthorizationError(ErrorMessages.UNAUTHORIZED);
     }
 
-    const tokens = await this.getTokens(user._id);
+    const tokens = await this.getTokens(user);
     await this.updateRefreshToken(user._id, tokens.refreshToken);
 
     return tokens;
@@ -79,8 +79,8 @@ export class AuthService {
     return user;
   }
 
-  async getTokens(userId: Schema.Types.ObjectId): Promise<TokensI> {
-    const payload = {_id: userId};
+  async getTokens(user: User): Promise<TokensI> {
+    const payload = {_id: user._id, roles: user.roles};
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         expiresIn: ACCESS_TOKEN_EXPIRED_TIME

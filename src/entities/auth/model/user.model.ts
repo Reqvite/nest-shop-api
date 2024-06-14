@@ -4,9 +4,21 @@ import {nameMaxLength, nameMinLength} from '../const/validation';
 
 export type UserDocument = HydratedDocument<User>;
 
+export enum UserRole {
+  USER = 'user',
+  ADMIN = 'admin'
+}
+
 @Schema({timestamps: true, versionKey: false})
 export class User {
   _id: ObjectId;
+
+  @Prop({
+    type: [String],
+    enum: UserRole,
+    default: [UserRole.USER]
+  })
+  roles: UserRole[];
 
   @Prop({required: true, minlength: nameMinLength, maxlength: nameMaxLength})
   firstName: string;
