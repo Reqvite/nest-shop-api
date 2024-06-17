@@ -1,5 +1,4 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {getOrdersStatisticPipeline} from '@/entities/dashboard/pipelines/getOrdersStatistic.pipeline';
 import {TimeLine} from '@/enums/timeLine.enum';
 
 interface StatisticI {
@@ -19,6 +18,15 @@ export class GetOrdersStatisticQueryParamsI {
 }
 
 export class GetOrdersStatisticsResponse {
-  @ApiProperty({type: () => [getOrdersStatisticPipeline]})
+  @ApiProperty({
+    example: [
+      {
+        orders: 200,
+        sales: 1324.44,
+        month: 'June',
+        indexBy: 'month'
+      }
+    ]
+  })
   data: StatisticI[];
 }
