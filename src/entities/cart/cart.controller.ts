@@ -2,16 +2,13 @@ import {Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards} from 
 import {ApiTags} from '@nestjs/swagger';
 import {ObjectId} from 'mongoose';
 import {GetCurrentUser} from '@/commons/decorators/getCurrentUser.decorator';
-import {HasRoles} from '@/commons/decorators/roles.decorator';
 import {AccessAuthGuard} from '@/commons/guards/jwt.guard';
-import {RolesGuard} from '@/commons/guards/roles.guard';
 import {ObjectIdValidationPipe} from '@/commons/pipes/objectIdValidation.pipe';
 import {YupValidationPipe} from '@/commons/pipes/yupValidation.pipe';
 import {GetOrdersResponseI} from '@/types/cart.interface';
 import {JwtPayloadI} from '@/types/jwt.interface';
 import {ProductWithOrderedQuantity} from '@/types/product.interface';
 import {CartItem} from '@/types/user.interface';
-import {UserRole} from '../auth/model/user.model';
 import {getProductsQueryParamsSchema} from '../product/validation/getProductsQueryParams.schema';
 import {CartService} from './cart.service';
 import {AddToCartDto} from './dto/addToCart.dto';
@@ -24,16 +21,6 @@ import {completeOrderSchema} from './validation/completeOrder.schema';
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
-
-  @Get('/orders-statistic')
-  @HasRoles([UserRole.ADMIN])
-  @UseGuards(AccessAuthGuard, RolesGuard)
-  @CartSwagger.getCart()
-  async getOrdersStatistic(
-    @Query(new YupValidationPipe(getProductsQueryParamsSchema)) {timeline}: any
-  ): Promise<GetOrdersResponseI> {
-    return this.cartService.getOrdersStatistic(timeline);
-  }
 
   @Get()
   @UseGuards(AccessAuthGuard)

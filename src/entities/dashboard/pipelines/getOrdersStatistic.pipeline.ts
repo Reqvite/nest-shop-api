@@ -1,5 +1,4 @@
 import {PipelineStage} from 'mongoose';
-import {dayOfWeekNames} from '@/const/dayOfWeekNames';
 import {monthNames} from '@/const/monthNames';
 import {Quarter} from '@/enums/quarter.enum';
 
@@ -12,6 +11,11 @@ const getGroup = () => {
       $sum: 1
     }
   };
+};
+
+const baseProjectOptions = {
+  sales: {$round: [{$divide: ['$sales', 1]}, 2]},
+  orders: 1
 };
 
 export const getOrdersStatisticPipeline = {
@@ -34,18 +38,18 @@ export const getOrdersStatisticPipeline = {
     {
       $project: {
         _id: 0,
-        name: {
+        month: {
           $arrayElemAt: [monthNames, {$subtract: ['$_id.month', 1]}]
         },
-        sales: 1,
-        orders: 1
+        indexBy: 'month',
+        ...baseProjectOptions
       }
     }
   ],
   weekly: (): PipelineStage[] => [
     {
       $group: {
-        _id: {$dayOfWeek: '$createdAt'},
+        _id: {$week: '$createdAt'},
         ...getGroup()
       }
     },
@@ -57,11 +61,9 @@ export const getOrdersStatisticPipeline = {
     {
       $project: {
         _id: 0,
-        name: {
-          $arrayElemAt: [dayOfWeekNames, {$subtract: ['$_id', 1]}]
-        },
-        sales: 1,
-        orders: 1
+        week: {$toString: '$_id'},
+        indexBy: 'week',
+        ...baseProjectOptions
       }
     }
   ],
@@ -96,14 +98,14 @@ export const getOrdersStatisticPipeline = {
     {
       $project: {
         _id: 0,
-        name: '$_id',
-        sales: 1,
-        orders: 1
+        quarter: '$_id',
+        indexBy: 'quarter',
+        ...baseProjectOptions
       }
     },
     {
       $sort: {
-        name: 1
+        quarter: 1
       }
     }
   ]
