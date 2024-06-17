@@ -1,7 +1,6 @@
 import {ApiProperty} from '@nestjs/swagger';
 import * as yup from 'yup';
 import {orderInformationSchema} from '@/entities/cart/validation/completeOrder.schema';
-import {TimeLine} from '@/enums/timeLine.enum';
 import {ProductWithOrderedQuantity} from './product.interface';
 
 export type BillingInfo = yup.InferType<typeof orderInformationSchema>;
@@ -87,12 +86,4 @@ export class GetCartResponseI {
   })
   products: ProductWithOrderedQuantity[];
   orderInformation: BillingInfo;
-}
-
-export class GetCartQueryParamsI {
-  @ApiProperty({
-    example: TimeLine.Quarter,
-    description: 'Specifies the timeline for fetching cart data.'
-  })
-  timeline: TimeLine;
 }

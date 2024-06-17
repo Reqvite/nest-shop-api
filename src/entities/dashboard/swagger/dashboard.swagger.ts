@@ -3,7 +3,7 @@ import {ApiOperation, ApiQuery, ApiResponse} from '@nestjs/swagger';
 import {SuccessMessages} from '@/const/success.const';
 import {GetOrdersStatisticsResponse} from '@/types/dashboard';
 
-export const CartSwagger = {
+export const DashboardSwagger = {
   getOrdersStatistic: () =>
     applyDecorators(
       ApiOperation({summary: 'Get orders statistic'}),

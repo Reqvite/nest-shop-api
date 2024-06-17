@@ -11,8 +11,11 @@ interface StatisticI {
   week?: string;
 }
 
-export interface OrdersStatisticParamsI {
-  timeline?: TimeLine;
+export class GetOrdersStatisticQueryParamsI {
+  @ApiProperty({
+    example: TimeLine.Quarter
+  })
+  timeline: TimeLine;
 }
 
 export class GetOrdersStatisticsResponse {

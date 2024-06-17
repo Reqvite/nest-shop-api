@@ -7,7 +7,7 @@ import {AddToCartDto} from '../dto/addToCart.dto';
 export const CartSwagger = {
   getOrders: () =>
     applyDecorators(
-      ApiOperation({summary: 'Get orders statistics'}),
+      ApiOperation({summary: 'Get orders'}),
       ApiResponse({status: HttpStatus.OK, description: SuccessMessages.SUCCESS, type: GetOrdersResponseI}),
       ApiQuery({name: 'page', type: 'string', required: false})
     ),

@@ -3,10 +3,10 @@ import {ApiTags} from '@nestjs/swagger';
 import {HasRoles} from '@/commons/decorators/roles.decorator';
 import {AccessAuthGuard} from '@/commons/guards/jwt.guard';
 import {RolesGuard} from '@/commons/guards/roles.guard';
-import {GetOrdersStatisticsResponse, OrdersStatisticParamsI} from '@/types/dashboard';
+import {GetOrdersStatisticQueryParamsI, GetOrdersStatisticsResponse} from '@/types/dashboard';
 import {UserRole} from '../auth/model/user.model';
-import {CartSwagger} from '../cart/swagger/cart.swagger';
 import {DashboardService} from './dashboard.service';
+import {DashboardSwagger} from './swagger/dashboard.swagger';
 
 @ApiTags('Dashboard')
 @Controller('dashboard')
@@ -16,8 +16,10 @@ export class DashboardController {
   @Get('/orders-statistic')
   @HasRoles([UserRole.ADMIN])
   @UseGuards(AccessAuthGuard, RolesGuard)
-  @CartSwagger.getCart()
-  async getOrdersStatistic(@Query() query: OrdersStatisticParamsI): Promise<GetOrdersStatisticsResponse['data']> {
+  @DashboardSwagger.getOrdersStatistic()
+  async getOrdersStatistic(
+    @Query() query: GetOrdersStatisticQueryParamsI
+  ): Promise<GetOrdersStatisticsResponse['data']> {
     return this.dashboardService.getOrdersStatistic(query.timeline);
   }
 }
