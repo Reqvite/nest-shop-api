@@ -1,5 +1,4 @@
 import {PipelineStage} from 'mongoose';
-import {monthNames} from '@/const/monthNames';
 import {Quarter} from '@/enums/quarter.enum';
 
 const getGroup = () => {
@@ -39,7 +38,7 @@ export const getOrdersStatisticPipeline = {
       $project: {
         _id: 0,
         month: {
-          $arrayElemAt: [monthNames, {$subtract: ['$_id.month', 1]}]
+          $subtract: ['$_id.month', 1]
         },
         indexBy: 'month',
         ...baseProjectOptions
