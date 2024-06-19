@@ -9,6 +9,9 @@ import rawBodyMiddleware from './commons/middlewares/rawBody.middleware';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(rawBodyMiddleware());
+  app.enableCors({
+    origin: '*'
+  });
   const document = SwaggerModule.createDocument(app, swaggerConfig(process.env.API_URL));
   SwaggerModule.setup('api-docs', app, document);
   app.enableCors();
