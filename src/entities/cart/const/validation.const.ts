@@ -11,6 +11,7 @@ export const labels = {
   zip: 'Zip code',
   email: 'Email',
   phoneNumber: 'Phone Number',
+  iso3: 'iso3',
   notes: 'Notes'
 };
 
@@ -42,6 +43,7 @@ const addressValidation = yup
   .max(lengths.maxLength, ErrorMessages.AT_MOST_LENGTH(lengths.maxLengthAddress, labels.address))
   .required(ErrorMessages.IS_REQUIRED(labels.address));
 const countryValidation = yup.string().required(ErrorMessages.IS_REQUIRED(labels.country));
+const iso3Validation = yup.string().required(ErrorMessages.IS_REQUIRED(labels.iso3));
 const cityValidation = yup.string().required(ErrorMessages.IS_REQUIRED(labels.city));
 const zipValidation = yup
   .string()
@@ -62,6 +64,7 @@ export {
   countryValidation,
   emailValidation,
   firstNameValidation,
+  iso3Validation,
   lastNameValidation,
   notesValidation,
   phoneNumberValidation,

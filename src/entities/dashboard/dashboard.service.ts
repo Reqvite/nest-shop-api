@@ -2,9 +2,10 @@ import {Injectable} from '@nestjs/common';
 import {InjectModel} from '@nestjs/mongoose';
 import {Model, PipelineStage} from 'mongoose';
 import {TimeLine} from '@/enums/timeLine.enum';
-import {GetOrdersStatisticsResponse} from '@/types/dashboard';
+import {GetOrdersGeoResponse, GetOrdersStatisticsResponse} from '@/types/dashboard';
 import {User} from '../auth/model/user.model';
 import {Order} from '../cart/model/order.model';
+import {getOrdersGeo} from './pipelines/getOrdersGeo.pipeline';
 import {getOrdersStatisticPipeline} from './pipelines/getOrdersStatistic.pipeline';
 
 @Injectable()
@@ -19,5 +20,10 @@ export class DashboardService {
     if (timeLine === TimeLine.Quarter) pipeline = getOrdersStatisticPipeline.quarterly();
 
     return await this.orderModel.aggregate(pipeline);
+  }
+
+  async getOrdersGeo(): Promise<GetOrdersGeoResponse> {
+    const data = await this.orderModel.aggregate(getOrdersGeo);
+    return data[0];
   }
 }

@@ -30,3 +30,19 @@ export class GetOrdersStatisticsResponse {
   })
   data: StatisticI[];
 }
+
+export class GetOrdersGeoResponse {
+  @ApiProperty({
+    example: [
+      {
+        id: 'UKR',
+        value: 111
+      }
+    ]
+  })
+  values: {id: string; value: number};
+  @ApiProperty({
+    example: [1, 100]
+  })
+  domain: number[];
+}
