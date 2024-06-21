@@ -75,14 +75,13 @@ export class CartService {
   async completeOrder({products, orderInformation, totalPrice}: CompleteOrderDto, userId: string): Promise<void> {
     const session = await this.connection.startSession();
     session.startTransaction();
-    await this.checkProductsStock(products);
 
     try {
+      await this.checkProductsStock(products);
+
       const updatedProducts = products.map(({_id, quantity}) => ({
         updateOne: {
-          filter: {
-            _id
-          },
+          filter: {_id},
           update: [
             {
               $set: {
@@ -95,20 +94,18 @@ export class CartService {
         }
       }));
 
-      await Promise.all([
-        this.productModel.bulkWrite(updatedProducts, {session}),
-        this.userModel.findByIdAndUpdate({_id: userId}, {cart: []}, {session}),
-        this.orderModel.create([{products, userId, billingInfo: getBillingInfo(orderInformation), totalPrice}], {
-          session
-        })
-      ]);
+      await this.productModel.bulkWrite(updatedProducts, {session});
+      await this.userModel.findByIdAndUpdate({_id: userId}, {cart: []}, {session});
+      await this.orderModel.create([{products, userId, billingInfo: getBillingInfo(orderInformation), totalPrice}], {
+        session
+      });
 
       await session.commitTransaction();
-      session.endSession();
     } catch (error) {
       await session.abortTransaction();
-      session.endSession();
       throw error;
+    } finally {
+      session.endSession();
     }
   }
 

@@ -11,5 +11,6 @@ export const getBillingInfo = (orderInformation: BillingInfo): Option[] => [
   {label: labels.country, value: orderInformation.country},
   {label: labels.city, value: orderInformation.city},
   {label: labels.zip, value: orderInformation.zip},
-  {label: labels.notes, value: orderInformation.notes}
+  {label: labels.notes, value: orderInformation.notes},
+  {label: labels.iso3, value: orderInformation.iso3}
 ];

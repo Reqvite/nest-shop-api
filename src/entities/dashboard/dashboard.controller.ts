@@ -3,7 +3,7 @@ import {ApiTags} from '@nestjs/swagger';
 import {HasRoles} from '@/commons/decorators/roles.decorator';
 import {AccessAuthGuard} from '@/commons/guards/jwt.guard';
 import {RolesGuard} from '@/commons/guards/roles.guard';
-import {GetOrdersStatisticQueryParamsI, GetOrdersStatisticsResponse} from '@/types/dashboard';
+import {GetOrdersGeoResponse, GetOrdersStatisticQueryParamsI, GetOrdersStatisticsResponse} from '@/types/dashboard';
 import {UserRole} from '../auth/model/user.model';
 import {DashboardService} from './dashboard.service';
 import {DashboardSwagger} from './swagger/dashboard.swagger';
@@ -21,5 +21,13 @@ export class DashboardController {
     @Query() query: GetOrdersStatisticQueryParamsI
   ): Promise<GetOrdersStatisticsResponse['data']> {
     return this.dashboardService.getOrdersStatistic(query.timeline);
+  }
+
+  @Get('/orders-geo')
+  @HasRoles([UserRole.ADMIN])
+  @UseGuards(AccessAuthGuard, RolesGuard)
+  @DashboardSwagger.getOrdersGeo()
+  async getOrdersGeo(): Promise<GetOrdersGeoResponse> {
+    return this.dashboardService.getOrdersGeo();
   }
 }

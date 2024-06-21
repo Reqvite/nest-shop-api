@@ -1,6 +1,5 @@
 import {Injectable} from '@nestjs/common';
 import {InjectConnection, InjectModel} from '@nestjs/mongoose';
-import {ObjectId} from 'mongodb';
 import mongoose, {Model, ObjectId as ObjectIdType} from 'mongoose';
 import {ErrorMessages} from '@/const/errors.const';
 import {isProductExist} from '@/lib/helpers/isProductExist.helper';
@@ -9,6 +8,7 @@ import {Product} from '../product/model/product.model';
 import {CreateReviewDto} from './dto/createReview.dto';
 import {UpdateReviewDto} from './dto/updateReview.dto';
 import {Review} from './model/review.model';
+import {getReviewsPipeline} from './pipelines/getReviews.pipeline';
 
 @Injectable()
 export class ReviewService {
@@ -19,50 +19,7 @@ export class ReviewService {
   ) {}
 
   async getProductReviews(productId: string): Promise<Review[]> {
-    const reviews = await this.reviewModel.aggregate([
-      {$sort: {createdAt: -1, _id: 1}},
-      {$match: {productId: new ObjectId(productId), parentId: null}},
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'userId',
-          foreignField: '_id',
-          as: 'user'
-        }
-      },
-      {$unwind: '$user'},
-      {
-        $addFields: {
-          username: {$concat: ['$user.firstName', ' ', '$user.lastName']}
-        }
-      },
-      {
-        $lookup: {
-          from: 'reviews',
-          localField: '_id',
-          foreignField: 'parentId',
-          as: 'children'
-        }
-      },
-      {
-        $addFields: {
-          children: {
-            $map: {
-              input: '$children',
-              as: 'child',
-              in: {
-                $mergeObjects: [
-                  '$$child',
-                  {
-                    username: '$username'
-                  }
-                ]
-              }
-            }
-          }
-        }
-      }
-    ]);
+    const reviews = await this.reviewModel.aggregate(getReviewsPipeline(productId));
 
     return reviews;
   }
